@@ -57,7 +57,7 @@
             
             <!-- Logo Block (Inside Card) -->
             <div class="mb-7 flex flex-col items-center">
-                <img src="{{ asset('build/assets/Smart-logo.png') }}" alt="SmartAttend Logo" class="w-16 h-16 object-contain mb-3">
+                <img src="{{ asset('logo.png') }}" alt="SmartAttend Logo" class="w-16 h-16 object-contain mb-3">
                 <h1 class="text-3xl font-bold text-[#0F172A] tracking-tight">SmartAttend</h1>
                 <p class="text-[11px] font-bold text-[#94A3B8] uppercase tracking-[0.2em] mt-1">Biometric Attendance System</p>
             </div>

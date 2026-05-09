@@ -13,7 +13,7 @@
 // --- CONFIGURATION ---
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
-const char* serverUrl = "http://your-server-ip/api"; // Update with your Laravel API URL
+const char* serverUrl = "http://172.16.114.151:8000/api"; // Update with your Laravel API URL
 const char* deviceId = "ROOM_101"; // Unique ID for this classroom device
 
 // --- HARDWARE PINOUT ---

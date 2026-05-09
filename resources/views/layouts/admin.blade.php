@@ -23,7 +23,7 @@
     <!-- Sidebar -->
     <aside class="sidebar fixed inset-y-0 left-0 flex flex-col text-white z-50">
         <div class="p-6 flex items-center gap-3">
-            <img src="{{ asset('build/assets/Smart-logo.png') }}" alt="Logo" class="w-10 h-10 object-contain">
+            <img src="{{ asset('logo.png') }}" alt="Logo" class="w-10 h-10 object-contain">
             <div>
                 <div class="font-bold text-xl">SmartAttend</div>
                 <div class="text-[11px] text-[#475569] font-medium uppercase tracking-widest">Admin Panel</div>

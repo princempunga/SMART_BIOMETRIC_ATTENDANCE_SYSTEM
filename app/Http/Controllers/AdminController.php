@@ -17,17 +17,25 @@ class AdminController extends Controller
 {
     public function index()
     {
+        $totalLogs = AttendanceLog::count();
+        $totalSessions = \App\Models\AttendanceSession::count();
+        $attendanceRate = $totalSessions > 0
+            ? round(($totalLogs / max($totalSessions, 1)) * 10, 1)
+            : 0;
+        $attendanceRate = min($attendanceRate, 100);
+
         $stats = [
             'students' => Student::count(),
             'lecturers' => User::where('role', 'lecturer')->count(),
             'courses' => Course::count(),
             'classrooms' => Classroom::count(),
             'active_sessions' => \App\Models\AttendanceSession::whereNull('session_end')->count(),
+            'attendance_rate' => $attendanceRate . '%',
         ];
 
-        $recentLogs = AttendanceLog::with(['student', 'session.course'])->latest()->take(5)->get();
+        $recentAttendance = AttendanceLog::with(['student', 'session.course', 'session.classroom'])->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('stats', 'recentLogs'));
+        return view('admin.dashboard', compact('stats', 'recentAttendance'));
     }
 
     public function lecturers()
@@ -226,12 +234,15 @@ class AdminController extends Controller
     public function attendance()
     {
         $logs = AttendanceLog::with(['student', 'session.course', 'session.classroom'])->latest()->paginate(15);
-        return view('admin.attendance', compact('logs'));
+        $courses = Course::all();
+        return view('admin.attendance', compact('logs', 'courses'));
     }
 
     public function reports()
     {
-        return view('admin.reports');
+        $courses = Course::all();
+        $exports = collect([]); // Placeholder for reports history
+        return view('admin.reports', compact('courses', 'exports'));
     }
 
     public function generateReport(Request $request)
