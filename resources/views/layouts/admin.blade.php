@@ -23,12 +23,10 @@
     <!-- Sidebar -->
     <aside class="sidebar fixed inset-y-0 left-0 flex flex-col text-white z-50">
         <div class="p-6 flex items-center gap-3">
-            <div class="w-12 h-12 bg-[#2563EB] rounded-xl flex items-center justify-center shadow-lg">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 21a10.003 10.003 0 008.384-4.562l.054.09A10.003 10.003 0 0112 3c1.259 0 2.455.232 3.559.654m-8.914 4.93L5.5 12l4.5 4.5m5.456-10.89l-4.5 4.5M11 11a2 2 0 114 0 2 2 0 01-4 0z"></path></svg>
-            </div>
+            <img src="{{ asset('build/assets/Smart-logo.png') }}" alt="Logo" class="w-10 h-10 object-contain">
             <div>
                 <div class="font-bold text-xl">SmartAttend</div>
-                <div class="text-[11px] text-[#475569] font-medium">ADMIN PANEL</div>
+                <div class="text-[11px] text-[#475569] font-medium uppercase tracking-widest">Admin Panel</div>
             </div>
         </div>
 

@@ -56,23 +56,10 @@
         <div class="bg-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100 p-[40px_44px]">
             
             <!-- Logo Block (Inside Card) -->
-            <div class="flex flex-col items-center mb-7">
-                <div class="w-[56px] h-[56px] bg-[#2563EB] rounded-[14px] flex items-center justify-center shadow-[0_8px_20px_rgba(37,99,235,0.35)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
-                        <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
-                        <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
-                        <path d="M2 12a10 10 0 0 1 18-6"/>
-                        <path d="M2 17c1 .5 2.5 1 4 1"/>
-                        <path d="M20 12c0 2-.5 4-2 5.5"/>
-                        <path d="M7 14c.67 2 1.33 4 2.33 6"/>
-                        <path d="M3.46 10a10 10 0 0 0-.17 1.76"/>
-                        <path d="M12 6a6 6 0 0 1 6 6"/>
-                        <path d="M12 8a4 4 0 0 1 4 4"/>
-                    </svg>
-                </div>
-                <h1 class="text-[20px] font-bold text-[#0F172A] mt-[14px]">SmartAttend</h1>
-                <p class="text-[12px] text-[#94A3B8] tracking-[0.04em] mt-1">Biometric Attendance System</p>
+            <div class="mb-7 flex flex-col items-center">
+                <img src="{{ asset('build/assets/Smart-logo.png') }}" alt="SmartAttend Logo" class="w-16 h-16 object-contain mb-3">
+                <h1 class="text-3xl font-bold text-[#0F172A] tracking-tight">SmartAttend</h1>
+                <p class="text-[11px] font-bold text-[#94A3B8] uppercase tracking-[0.2em] mt-1">Biometric Attendance System</p>
             </div>
 
             <!-- Horizontal Divider -->

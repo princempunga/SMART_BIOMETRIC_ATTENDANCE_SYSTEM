@@ -146,22 +146,68 @@
         </div>
     </div>
 
-    <!-- Attendance Chart -->
-    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-        <h3 class="font-bold text-[#0F172A] mb-8">Attendance This Week</h3>
-        <div class="flex items-end justify-between h-48 gap-4 px-4">
-            @php $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; @endphp
-            @foreach($days as $day)
-            @php $h = rand(40, 95); @endphp
-            <div class="flex-1 flex flex-col items-center gap-4 group">
-                <div class="w-full bg-slate-50 rounded-lg h-40 relative flex items-end overflow-hidden">
-                    <div class="w-full bg-[#2563EB]/80 group-hover:bg-[#2563EB] transition-all rounded-t-md" style="height: {{ $h }}%">
-                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#0F172A] text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{{ $h }}%</div>
-                    </div>
+    <!-- Attendance Chart Card -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-bold text-[#0F172A]">Attendance This Week</h3>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#2563EB]"></span>
+                    <span class="text-xs font-medium text-[#94A3B8]">Present</span>
                 </div>
-                <span class="text-xs font-bold text-[#475569]">{{ $day }}</span>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></span>
+                    <span class="text-xs font-medium text-[#94A3B8]">Absent</span>
+                </div>
             </div>
-            @endforeach
+        </div>
+
+        <div class="relative h-[240px] mt-4">
+            <!-- Grid Lines -->
+            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
+                @foreach([100, 80, 60, 40, 20] as $level)
+                <div class="flex items-center gap-4">
+                    <span class="text-[11px] font-bold text-[#CBD5E1] w-8 text-right">{{ $level }}%</span>
+                    <div class="flex-1 border-t border-dashed border-[#F1F5F9]"></div>
+                </div>
+                @endforeach
+                <div class="flex items-center gap-4">
+                    <span class="text-[11px] font-bold text-[#CBD5E1] w-8 text-right">0%</span>
+                    <div class="flex-1 border-t border-slate-200"></div>
+                </div>
+            </div>
+
+            <!-- Bars Area -->
+            <div class="absolute inset-0 pl-12 pr-4 flex justify-between items-end pb-8">
+                @php 
+                    $data = [
+                        'Mon' => 85, 'Tue' => 72, 'Wed' => 90, 
+                        'Thu' => 68, 'Fri' => 78, 'Sat' => 45
+                    ];
+                @endphp
+
+                @foreach($data as $day => $val)
+                <div class="flex-1 flex flex-col items-center group relative h-[200px]">
+                    <!-- Tooltip -->
+                    <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#0F172A] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none shadow-xl">
+                        {{ $val }}% Attendance
+                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0F172A] rotate-45"></div>
+                    </div>
+
+                    <!-- Bar -->
+                    <div class="relative w-12 flex flex-col items-center h-full">
+                        <div class="absolute bottom-0 w-full rounded-t-lg transition-all duration-300 group-hover:opacity-85 group-hover:scale-y-[1.02] origin-bottom shadow-lg" 
+                             style="height: {{ $val }}%; background: linear-gradient(to top, #1D4ED8, #60A5FA);">
+                            <!-- Percentage Label -->
+                            <span class="absolute -top-7 left-1/2 -translate-x-1/2 text-xs font-bold text-[#2563EB] whitespace-nowrap">{{ $val }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Day Label -->
+                    <div class="absolute -bottom-8 text-xs font-bold text-[#94A3B8]">{{ $day }}</div>
+                </div>
+                @endforeach
+            </div>
         </div>
     </div>
 </div>
