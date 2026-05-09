@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Classroom extends Model
 {
-    protected $fillable = ['room_name', 'device_id'];
+    protected $fillable = ['room_name'];
+
+    public function device()
+    {
+        return $this->hasOne(Device::class);
+    }
 
     public function sessions()
     {

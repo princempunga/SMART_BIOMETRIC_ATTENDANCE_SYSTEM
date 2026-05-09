@@ -1,13 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+$routes = file_get_contents('routes/web.php');
 
-Route::get('/', function () {
-    return redirect('/login');
-});
-
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+$newAdminGroup = "Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
     
     Route::resource('faculties', App\Http\Controllers\Admin\FacultyController::class);
@@ -26,19 +21,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/attendance', [App\Http\Controllers\AdminController::class, 'attendance'])->name('attendance');
     Route::get('/reports', [App\Http\Controllers\AdminController::class, 'reports'])->name('reports');
     Route::post('/reports/generate', [App\Http\Controllers\AdminController::class, 'generateReport'])->name('reports.generate');
-});
+});";
 
-Route::middleware(['auth', 'verified'])->prefix('lecturer')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\LecturerController::class, 'index'])->middleware('role:lecturer')->name('lecturer.dashboard');
-    Route::get('/courses', [App\Http\Controllers\LecturerController::class, 'courses'])->middleware('role:lecturer')->name('lecturer.courses');
-    Route::get('/sessions', [App\Http\Controllers\LecturerController::class, 'sessions'])->middleware('role:lecturer')->name('lecturer.sessions');
-    Route::get('/attendance', [App\Http\Controllers\LecturerController::class, 'attendance'])->middleware('role:lecturer')->name('lecturer.attendance');
-});
+$startStr = "Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {";
+$endStr = "Route::middleware(['auth', 'verified'])->prefix('lecturer')->group(function () {";
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+$startIndex = strpos($routes, $startStr);
+$endIndex = strpos($routes, $endStr);
 
-require __DIR__.'/auth.php';
+if ($startIndex !== false && $endIndex !== false) {
+    $before = substr($routes, 0, $startIndex);
+    $after = substr($routes, $endIndex);
+    
+    $finalRoutes = $before . $newAdminGroup . "\n\n" . $after;
+    file_put_contents('routes/web.php', $finalRoutes);
+    echo "Routes updated successfully.\n";
+} else {
+    echo "Could not find route group markers.\n";
+}

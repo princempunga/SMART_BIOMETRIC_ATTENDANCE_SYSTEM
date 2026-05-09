@@ -104,7 +104,7 @@
         <div class="lg:col-span-2 space-y-6">
             <h3 class="font-bold text-[#0F172A] px-1">Quick Actions</h3>
             <div class="grid gap-4">
-                <a href="{{ route('admin.students') }}" class="group bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-[#F8FAFC] transition-all">
+                <a href="{{ route('admin.students.index') }}" class="group bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-[#F8FAFC] transition-all">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -117,7 +117,7 @@
                     <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
 
-                <a href="{{ route('admin.lecturers') }}" class="group bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-[#F8FAFC] transition-all">
+                <a href="{{ route('admin.lecturers.index') }}" class="group bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between hover:bg-[#F8FAFC] transition-all">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>

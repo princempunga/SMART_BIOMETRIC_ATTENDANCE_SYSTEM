@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('full_name');
             $table->string('reg_number')->unique();
             $table->string('photo')->nullable();
-            $table->string('faculty');
-            $table->string('department');
+            $table->foreignId('faculty_id')->constrained()->onDelete('cascade');
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->integer('fingerprint_id')->unique();
             $table->timestamps();
         });

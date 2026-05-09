@@ -1,0 +1,281 @@
+<?php
+
+$files = [
+    'students' => [
+        'title' => 'Students',
+        'singular' => 'student',
+        'fields' => [
+            'full_name' => 'Full Name',
+            'reg_number' => 'Reg Number',
+            'faculty_id' => 'Faculty',
+            'department_id' => 'Department',
+            'fingerprint_id' => 'Fingerprint ID'
+        ]
+    ],
+    'lecturers' => [
+        'title' => 'Lecturers',
+        'singular' => 'lecturer',
+        'fields' => [
+            'name' => 'Name',
+            'email' => 'Email',
+            'password' => 'Password (leave blank to keep)',
+            'faculty_id' => 'Faculty',
+            'department_id' => 'Department',
+            'phone' => 'Phone'
+        ]
+    ],
+    'classrooms' => [
+        'title' => 'Classrooms',
+        'singular' => 'classroom',
+        'fields' => [
+            'room_name' => 'Room Name'
+        ]
+    ],
+    'devices' => [
+        'title' => 'Devices',
+        'singular' => 'device',
+        'fields' => [
+            'device_code' => 'Device Code',
+            'classroom_id' => 'Classroom',
+            'device_api_token' => 'API Token',
+            'status' => 'Status'
+        ]
+    ]
+];
+
+foreach ($files as $plural => $config) {
+    $title = $config['title'];
+    $singular = $config['singular'];
+    $fields = $config['fields'];
+    
+    $html = "@extends('layouts.admin')
+
+@section('page_title', '{$title}')
+
+@section('content')
+<div class=\"space-y-6\">
+    <div class=\"flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100\">
+        <h3 class=\"font-bold text-[#0F172A]\">{$title} Management</h3>
+        <button onclick=\"document.getElementById('addModal').classList.remove('hidden')\" class=\"bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2\">
+            <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg>
+            <span>Add {$title}</span>
+        </button>
+    </div>
+
+    <div class=\"bg-white rounded-xl shadow-sm overflow-hidden border border-slate-100\">
+        <div class=\"overflow-x-auto\">
+            <table class=\"w-full text-left\">
+                <thead class=\"bg-slate-50 text-[11px] font-bold text-[#475569] uppercase tracking-wider\">
+                    <tr>
+                        <th class=\"px-6 py-4\">ID</th>\n";
+                        
+    foreach($fields as $k => $v) {
+        $html .= "                        <th class=\"px-6 py-4\">{$v}</th>\n";
+    }
+
+    $html .= "                        <th class=\"px-6 py-4 text-right\">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class=\"divide-y divide-slate-100\">
+                    @forelse(\${$plural} as \$item)
+                    <tr class=\"hover:bg-slate-50 transition-colors\">
+                        <td class=\"px-6 py-4 text-sm font-semibold text-[#475569]\">{{ \$item->id }}</td>\n";
+                        
+    foreach($fields as $k => $v) {
+        if ($k == 'faculty_id') {
+            $html .= "                        <td class=\"px-6 py-4 text-sm text-[#475569]\">{{ \$item->faculty->faculty_name ?? 'N/A' }}</td>\n";
+        } elseif ($k == 'department_id') {
+            $html .= "                        <td class=\"px-6 py-4 text-sm text-[#475569]\">{{ \$item->department->department_name ?? 'N/A' }}</td>\n";
+        } elseif ($k == 'classroom_id') {
+            $html .= "                        <td class=\"px-6 py-4 text-sm text-[#475569]\">{{ \$item->classroom->room_name ?? 'N/A' }}</td>\n";
+        } else {
+            $html .= "                        <td class=\"px-6 py-4 text-sm text-[#475569]\">{{ \$item->{$k} }}</td>\n";
+        }
+    }
+
+    $html .= "                        <td class=\"px-6 py-4 text-right space-x-2\">
+                            <button onclick=\"openEditModal_{$plural}({{ json_encode(\$item) }})\" class=\"p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors\">
+                                <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z\"></path></svg>
+                            </button>
+                            <form action=\"{{ route('admin.{$plural}.destroy', \$item->id) }}\" method=\"POST\" class=\"inline\" onsubmit=\"return confirm('Are you sure?')\">
+                                @csrf
+                                @method('DELETE')
+                                <button type=\"submit\" class=\"p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors\">
+                                    <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16\"></path></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan=\"5\" class=\"px-6 py-20 text-center text-slate-400 italic text-sm font-medium\">No {$plural} found.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div id=\"addModal\" class=\"modal-overlay fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden\">
+    <div class=\"bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all\">
+        <div class=\"p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50\">
+            <div>
+                <h3 class=\"text-xl font-bold text-[#0F172A]\">Add New {$title}</h3>
+            </div>
+            <button onclick=\"document.getElementById('addModal').classList.add('hidden')\" class=\"text-slate-400 hover:text-[#0F172A] transition-colors\">
+                <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg>
+            </button>
+        </div>
+        
+        <form action=\"{{ route('admin.{$plural}.store') }}\" method=\"POST\" class=\"p-8 space-y-6\">
+            @csrf\n";
+
+    foreach($fields as $k => $v) {
+        if ($k == 'faculty_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Faculty</option>
+                    @foreach(\\App\\Models\\Faculty::all() as \$fac)
+                    <option value=\"{{ \$fac->id }}\">{{ \$fac->faculty_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'department_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Department</option>
+                    @foreach(\\App\\Models\\Department::all() as \$dep)
+                    <option value=\"{{ \$dep->id }}\">{{ \$dep->department_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'classroom_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Classroom</option>
+                    @foreach(\\App\\Models\\Classroom::all() as \$room)
+                    <option value=\"{{ \$room->id }}\">{{ \$room->room_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'status') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"active\">Active</option>
+                    <option value=\"inactive\">Inactive</option>
+                </select>
+            </div>\n";
+        } else {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <input type=\"text\" name=\"{$k}\" " . ($k !== 'password' ? 'required' : '') . " class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+            </div>\n";
+        }
+    }
+
+    $html .= "            <div class=\"pt-4\">
+                <button type=\"submit\" class=\"w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all transform active:scale-[0.98]\">
+                    Save {$title}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id=\"editModal\" class=\"modal-overlay fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden\">
+    <div class=\"bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all\">
+        <div class=\"p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50\">
+            <div>
+                <h3 class=\"text-xl font-bold text-[#0F172A]\">Edit {$title}</h3>
+            </div>
+            <button onclick=\"document.getElementById('editModal').classList.add('hidden')\" class=\"text-slate-400 hover:text-[#0F172A] transition-colors\">
+                <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg>
+            </button>
+        </div>
+        
+        <form id=\"editForm_{$plural}\" method=\"POST\" class=\"p-8 space-y-6\">
+            @csrf
+            @method('PATCH')\n";
+
+    foreach($fields as $k => $v) {
+        if ($k == 'faculty_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" id=\"edit_{$k}_{$plural}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Faculty</option>
+                    @foreach(\\App\\Models\\Faculty::all() as \$fac)
+                    <option value=\"{{ \$fac->id }}\">{{ \$fac->faculty_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'department_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" id=\"edit_{$k}_{$plural}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Department</option>
+                    @foreach(\\App\\Models\\Department::all() as \$dep)
+                    <option value=\"{{ \$dep->id }}\">{{ \$dep->department_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'classroom_id') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" id=\"edit_{$k}_{$plural}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"\">Select Classroom</option>
+                    @foreach(\\App\\Models\\Classroom::all() as \$room)
+                    <option value=\"{{ \$room->id }}\">{{ \$room->room_name }}</option>
+                    @endforeach
+                </select>
+            </div>\n";
+        } elseif ($k == 'status') {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <select name=\"{$k}\" id=\"edit_{$k}_{$plural}\" required class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+                    <option value=\"active\">Active</option>
+                    <option value=\"inactive\">Inactive</option>
+                </select>
+            </div>\n";
+        } else {
+            $html .= "            <div>
+                <label class=\"block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2\">{$v}</label>
+                <input type=\"text\" name=\"{$k}\" id=\"edit_{$k}_{$plural}\" " . ($k !== 'password' ? 'required' : '') . " class=\"w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium\">
+            </div>\n";
+        }
+    }
+
+    $html .= "            <div class=\"pt-4\">
+                <button type=\"submit\" class=\"w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all transform active:scale-[0.98]\">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal_{$plural}(item) {
+        document.getElementById('editForm_{$plural}').action = `/admin/{$plural}/\${item.id}`;
+";
+
+    foreach($fields as $k => $v) {
+        if ($k !== 'password') {
+            $html .= "        if(document.getElementById('edit_{$k}_{$plural}')) document.getElementById('edit_{$k}_{$plural}').value = item.{$k};\n";
+        }
+    }
+
+    $html .= "        document.getElementById('editModal').classList.remove('hidden');
+    }
+</script>
+@endsection";
+
+    file_put_contents("resources/views/admin/{$plural}/index.blade.php", $html);
+}
+echo "Modal views generated for students, lecturers, classrooms, devices.\n";

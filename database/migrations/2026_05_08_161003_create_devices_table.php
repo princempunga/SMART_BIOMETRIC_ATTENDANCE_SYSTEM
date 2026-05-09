@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classrooms', function (Blueprint $table) {
+        Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->string('room_name');
-            $table->string('device_id')->unique();
+            $table->foreignId('classroom_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('device_code')->unique();
+            $table->string('device_api_token')->unique();
+            $table->string('status')->default('active'); // active, inactive
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classrooms');
+        Schema::dropIfExists('devices');
     }
 };
