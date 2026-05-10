@@ -28,11 +28,24 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/reports/generate', [App\Http\Controllers\AdminController::class, 'generateReport'])->name('reports.generate');
 });
 
-Route::middleware(['auth', 'verified'])->prefix('lecturer')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\LecturerController::class, 'index'])->middleware('role:lecturer')->name('lecturer.dashboard');
-    Route::get('/courses', [App\Http\Controllers\LecturerController::class, 'courses'])->middleware('role:lecturer')->name('lecturer.courses');
-    Route::get('/sessions', [App\Http\Controllers\LecturerController::class, 'sessions'])->middleware('role:lecturer')->name('lecturer.sessions');
-    Route::get('/attendance', [App\Http\Controllers\LecturerController::class, 'attendance'])->middleware('role:lecturer')->name('lecturer.attendance');
+Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\LecturerController::class, 'index'])->name('dashboard');
+    Route::get('/courses', [App\Http\Controllers\LecturerController::class, 'courses'])->name('courses');
+    Route::get('/sessions', [App\Http\Controllers\LecturerController::class, 'sessions'])->name('sessions');
+    Route::get('/sessions/{session}/logs', [App\Http\Controllers\LecturerController::class, 'getAttendanceLogs'])->name('sessions.logs');
+    Route::get('/attendance', [App\Http\Controllers\LecturerController::class, 'attendance'])->name('attendance');
+    Route::get('/reports', [App\Http\Controllers\LecturerController::class, 'reports'])->name('reports');
+    
+    // New Session Routes
+    Route::post('/sessions/start', [App\Http\Controllers\LecturerController::class, 'startSession'])->name('sessions.start');
+    Route::get('/sessions/{session}/active', [App\Http\Controllers\LecturerController::class, 'activeSession'])->name('sessions.active');
+    Route::post('/sessions/{session}/verify', [App\Http\Controllers\LecturerController::class, 'verifyOtp'])->name('sessions.verify');
+    Route::post('/sessions/{session}/complete', [App\Http\Controllers\LecturerController::class, 'completeSession'])->name('sessions.complete');
+    Route::get('/sessions/{session}/count', [App\Http\Controllers\LecturerController::class, 'getAttendanceCount'])->name('sessions.count');
+
+    // Simulation Routes
+    Route::get('/test-environment', [App\Http\Controllers\AttendanceSimulationController::class, 'index'])->name('test-environment');
+    Route::post('/simulate-scan', [App\Http\Controllers\AttendanceSimulationController::class, 'simulateScan'])->name('simulate-scan');
 });
 
 Route::middleware('auth')->group(function () {

@@ -42,15 +42,15 @@
                     @forelse($logs as $log)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4">
-                            <div class="font-bold text-[#0F172A] text-sm">{{ $log->student->name }}</div>
+                            <div class="font-bold text-[#0F172A] text-sm">{{ $log->student->full_name }}</div>
                             <div class="text-[10px] text-[#94A3B8]">{{ $log->student->reg_number }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <span class="text-sm font-semibold text-[#475569]">{{ $log->session->course->course_code }}</span>
                         </td>
                         <td class="px-6 py-4 text-sm text-[#94A3B8] font-medium">{{ $log->session->classroom->room_name }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ $log->clock_in->format('H:i') }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ $log->clock_out ? $log->clock_out->format('H:i') : '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ \Carbon\Carbon::parse($log->clock_in)->format('H:i') }}</td>
+                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ $log->clock_out ? \Carbon\Carbon::parse($log->clock_out)->format('H:i') : '-' }}</td>
                         <td class="px-6 py-4 text-center">
                             <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-lg">{{ $log->attendance_mark ?? 10 }}/10</span>
                         </td>

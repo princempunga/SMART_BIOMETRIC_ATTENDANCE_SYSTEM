@@ -12,7 +12,7 @@
             <p class="text-slate-400 text-sm leading-relaxed max-w-md italic">Start a session to enable biometric enrollment for your students in the selected classroom.</p>
         </div>
         
-        <form action="#" method="POST" class="relative z-10 flex flex-col md:flex-row items-end gap-4 w-full md:w-auto">
+        <form action="{{ route('lecturer.sessions.start') }}" method="POST" class="relative z-10 flex flex-col md:flex-row items-end gap-4 w-full md:w-auto">
             @csrf
             <div class="w-full md:w-56">
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Subject</label>
@@ -55,15 +55,15 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse($sessions as $session)
+                    @forelse($sessions as $item)
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 font-bold text-[#0F172A] text-sm">{{ $session->course->course_code }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ $session->classroom->room_name }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569]">{{ $session->session_start->format('M d, H:i') }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569]">{{ $session->session_end ? $session->session_end->format('H:i') : '-' }}</td>
-                        <td class="px-6 py-4 font-mono text-xs text-[#2563EB] font-bold">{{ $session->otp }}</td>
+                        <td class="px-6 py-4 font-bold text-[#0F172A] text-sm">{{ $item->course->course_code }}</td>
+                        <td class="px-6 py-4 text-sm text-[#475569] font-medium">{{ $item->classroom->room_name }}</td>
+                        <td class="px-6 py-4 text-sm text-[#475569]">{{ \Carbon\Carbon::parse($item->session_start)->format('M d, H:i') }}</td>
+                        <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->session_end ? \Carbon\Carbon::parse($item->session_end)->format('H:i') : '-' }}</td>
+                        <td class="px-6 py-4 font-mono text-xs text-[#2563EB] font-bold">{{ $item->otp }}</td>
                         <td class="px-6 py-4 text-center">
-                            @if(!$session->session_end)
+                            @if(!$item->session_end)
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                                 Live

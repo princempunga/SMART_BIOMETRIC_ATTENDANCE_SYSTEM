@@ -24,6 +24,7 @@
                     <tr>
                         <th class="px-6 py-4">Lecturer</th>
                         <th class="px-6 py-4">Academic Placement</th>
+                        <th class="px-6 py-4">Assigned Subjects</th>
                         <th class="px-6 py-4">Contact Details</th>
                         <th class="px-6 py-4 text-right">Actions</th>
                     </tr>
@@ -51,6 +52,20 @@
                             <div class="text-[11px] text-[#94A3B8]">{{ $lecturer->department->department_name ?? 'No Department' }}</div>
                         </td>
                         <td class="px-6 py-4">
+                            @if($lecturer->courses->isEmpty())
+                                <span class="text-[11px] text-slate-400 italic">No subjects assigned</span>
+                            @else
+                                <div class="flex flex-wrap gap-1.5 max-w-xs">
+                                    @foreach($lecturer->courses as $course)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-[#2563EB]/10 text-[#2563EB] text-[10px] font-bold rounded-lg uppercase tracking-wide whitespace-nowrap" title="{{ $course->course_name }}">
+                                        <svg class="w-2.5 h-2.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+                                        {{ $course->course_code }}
+                                    </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
                             <div class="text-sm font-medium text-[#475569]">{{ $lecturer->email }}</div>
                             <div class="text-[11px] text-[#2563EB] font-bold">{{ $lecturer->phone ?? 'No Phone' }}</div>
                         </td>
@@ -69,7 +84,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-20 text-center text-slate-400 italic text-sm font-medium">No lecturers registered in the academic system.</td>
+                        <td colspan="5" class="px-6 py-20 text-center text-slate-400 italic text-sm font-medium">No lecturers registered in the academic system.</td>
                     </tr>
                     @endforelse
                 </tbody>

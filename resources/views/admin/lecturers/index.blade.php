@@ -47,7 +47,20 @@
                         <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->password }}</td>
                         <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->faculty->faculty_name ?? 'N/A' }}</td>
                         <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->department->department_name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->subject }}</td>
+                        <td class="px-6 py-4">
+                            @if($item->courses->isEmpty())
+                                <span class="text-[11px] text-slate-400 italic">None assigned</span>
+                            @else
+                                <div class="flex flex-wrap gap-1.5 max-w-[200px]">
+                                    @foreach($item->courses as $course)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-[#2563EB]/10 text-[#2563EB] text-[10px] font-bold rounded-lg uppercase tracking-wide whitespace-nowrap" title="{{ $course->course_name }}">
+                                        <svg class="w-2.5 h-2.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+                                        {{ $course->course_code }}
+                                    </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm text-[#475569]">{{ $item->phone }}</td>
                         <td class="px-6 py-4 text-right space-x-2">
                             <button onclick="openEditModal_lecturers({{ json_encode($item) }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
@@ -64,7 +77,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-20 text-center text-slate-400 italic text-sm font-medium">No lecturers found.</td>
+                        <td colspan="10" class="px-6 py-20 text-center text-slate-400 italic text-sm font-medium">No lecturers found.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -186,10 +199,6 @@
                     <option value="{{ $dep->id }}">{{ $dep->department_name }}</option>
                     @endforeach
                 </select>
-            </div>
-                        <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Subject Specialization</label>
-                <input type="text" name="subject" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-medium">
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Subject Specialization</label>

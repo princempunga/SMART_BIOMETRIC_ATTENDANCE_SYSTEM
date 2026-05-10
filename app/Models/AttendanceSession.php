@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttendanceSession extends Model
 {
-    protected $fillable = ['course_id', 'lecturer_id', 'classroom_id', 'session_start', 'session_end', 'otp'];
+    protected $fillable = ['course_id', 'lecturer_id', 'classroom_id', 'timetable_id', 'session_start', 'session_end', 'week_number', 'otp', 'status'];
 
     public function course()
     {
@@ -23,8 +23,33 @@ class AttendanceSession extends Model
         return $this->belongsTo(Classroom::class);
     }
 
+    public function timetable()
+    {
+        return $this->belongsTo(Timetable::class);
+    }
+
     public function attendanceLogs()
     {
         return $this->hasMany(AttendanceLog::class, 'session_id');
+    }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isActive()
+    {
+        return $this->status === 'active';
+    }
+
+    public function isCompleted()
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isExpired()
+    {
+        return $this->status === 'expired';
     }
 }

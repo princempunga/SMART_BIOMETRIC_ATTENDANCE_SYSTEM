@@ -13,7 +13,7 @@ class LecturerController extends Controller
 {
     public function index()
     {
-        $lecturers = User::where('role', 'lecturer')->get();
+        $lecturers = User::where('role', 'lecturer')->with(['courses', 'faculty', 'department'])->get();
         return view('admin.lecturers.index', compact('lecturers'));
     }
 
