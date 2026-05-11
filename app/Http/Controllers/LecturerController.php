@@ -28,18 +28,25 @@ class LecturerController extends Controller
                 $q->where('end_time', '<', $now->format('H:i'));
             })->update(['status' => 'expired']);
 
+        $totalStudents = Student::whereHas('attendanceLogs.session', function($q) use ($lecturerId) {
+            $q->where('lecturer_id', $lecturerId);
+        })->count();
+
         $stats = [
-            'courses' => Course::where('lecturer_id', $lecturerId)->count(),
+            'courses' => Auth::user()->courseUnits()->count(),
             'active_sessions' => AttendanceSession::where('lecturer_id', $lecturerId)
                 ->where('status', 'active')
                 ->count(),
-            'total_students' => 0,
+            'total_students' => $totalStudents,
+            'total_logs' => AttendanceLog::whereHas('session', function($q) use ($lecturerId) {
+                $q->where('lecturer_id', $lecturerId);
+            })->count(),
             'avg_attendance' => '78%',
             'current_week' => $currentWeek
         ];
 
-        $todayTimetable = Timetable::whereHas('course', function($q) use ($lecturerId) {
-                $q->where('lecturer_id', $lecturerId);
+        $todayTimetable = Timetable::whereHas('course.lecturers', function($q) use ($lecturerId) {
+                $q->where('users.id', $lecturerId);
             })
             ->where('day_of_week', $now->dayOfWeek)
             ->with(['course', 'classroom'])
@@ -50,7 +57,7 @@ class LecturerController extends Controller
             ->with(['course', 'classroom', 'timetable'])
             ->first();
 
-        $courses = Course::where('lecturer_id', $lecturerId)->get();
+        $courses = Auth::user()->courseUnits;
         $classrooms = Classroom::all();
 
         $recentLogs = AttendanceLog::whereHas('session', function($q) use ($lecturerId) {
@@ -63,34 +70,20 @@ class LecturerController extends Controller
     public function startSession(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:course_units,id',
             'classroom_id' => 'required|exists:classrooms,id',
+            'week_number' => 'required|integer|min:1|max:16',
         ]);
 
         $now = Carbon::now();
-        $dayOfWeek = $now->dayOfWeek;
-        $currentTime = $now->format('H:i:s');
-
-        // Find timetable
+        
+        // Find timetable (more flexible)
         $timetable = Timetable::where('course_id', $request->course_id)
             ->where('classroom_id', $request->classroom_id)
-            ->where('day_of_week', $dayOfWeek)
             ->first();
 
-        if (!$timetable) {
-            return redirect()->back()->with('error', 'No timetable found for this course and classroom today.');
-        }
-
-        // Validate start time (±15 mins)
-        $startTime = Carbon::createFromFormat('H:i:s', $timetable->start_time);
-        $diffInMinutes = $now->diffInMinutes($startTime, false);
-
-        if (abs($diffInMinutes) > 15) {
-            return redirect()->back()->with('error', 'Sessions can only be started within 15 minutes of their scheduled time. Scheduled: ' . $startTime->format('H:i'));
-        }
-
-        $semesterStart = Carbon::parse('2026-01-20');
-        $currentWeek = $now->diffInWeeks($semesterStart) + 1;
+        // If no specific timetable, we still allow starting but warn or handle it
+        $timetableId = $timetable ? $timetable->id : null;
 
         $otp = strtoupper(Str::random(6));
 
@@ -98,14 +91,14 @@ class LecturerController extends Controller
             'course_id' => $request->course_id,
             'lecturer_id' => Auth::id(),
             'classroom_id' => $request->classroom_id,
-            'timetable_id' => $timetable->id,
+            'timetable_id' => $timetableId,
             'session_start' => $now,
-            'week_number' => $currentWeek,
+            'week_number' => $request->week_number,
             'otp' => $otp,
             'status' => 'pending'
         ]);
 
-        return redirect()->route('lecturer.sessions.active', $session)->with('success', 'Session started! Please verify OTP to activate.');
+        return redirect()->route('lecturer.sessions.active', $session)->with('success', 'Session initialized! Please verify OTP to start tracking.');
     }
 
     public function activeSession(AttendanceSession $session)
@@ -130,11 +123,26 @@ class LecturerController extends Controller
 
     public function completeSession(AttendanceSession $session)
     {
+        $now = Carbon::now();
         $session->update([
             'status' => 'completed',
-            'session_end' => Carbon::now()
+            'session_end' => $now
         ]);
-        return redirect()->route('lecturer.dashboard')->with('success', 'Session completed successfully.');
+
+        // Auto-clock out students who are still "In Class"
+        AttendanceLog::where('session_id', $session->id)
+            ->whereNull('clock_out')
+            ->update(['clock_out' => $now]);
+
+        $totalDuration = $session->duration;
+
+        // Calculate marks for all logs in this session
+        foreach ($session->attendanceLogs()->get() as $log) {
+            $log->calculateDurationAndMark($totalDuration);
+            $log->save();
+        }
+
+        return redirect()->route('lecturer.dashboard')->with('success', 'Session completed! Attendance credits have been calculated.');
     }
 
     public function getAttendanceCount(AttendanceSession $session)
@@ -150,14 +158,28 @@ class LecturerController extends Controller
             ->with('student')
             ->latest()
             ->get()
-            ->map(function($log) {
+            ->map(function($log) use ($session) {
+                // Calculate temporary duration if session is still active
+                $duration = $log->clock_out 
+                    ? $log->clock_in->diffInMinutes($log->clock_out) 
+                    : $log->clock_in->diffInMinutes(Carbon::now());
+
+                // Calculate temporary mark
+                $scheduledDuration = $session->timetable ? Carbon::parse($session->timetable->start_time)->diffInMinutes(Carbon::parse($session->timetable->end_time)) : 60;
+                $percentage = ($duration / max($scheduledDuration, 1)) * 100;
+                $credit = 0;
+                if ($percentage >= 80) $credit = 1.0;
+                elseif ($percentage >= 50) $credit = 0.7;
+                elseif ($percentage >= 20) $credit = 0.5;
+
                 return [
                     'student_name' => $log->student->full_name,
                     'reg_number' => $log->student->reg_number,
                     'clock_in' => $log->clock_in->format('H:i:s'),
                     'clock_out' => $log->clock_out ? $log->clock_out->format('H:i:s') : '—',
-                    'duration' => $log->duration . ' mins',
-                    'status' => $log->attendance_status
+                    'duration' => $duration . 'm',
+                    'status' => $log->clock_out ? 'Clocked Out' : 'In Class',
+                    'credit' => $credit
                 ];
             });
 
@@ -172,34 +194,47 @@ class LecturerController extends Controller
 
     public function sessions()
     {
+        $now = Carbon::now();
+        $semesterStart = Carbon::parse('2026-01-20');
+        $currentWeek = $now->diffInWeeks($semesterStart) + 1;
+
         $sessions = AttendanceSession::where('lecturer_id', Auth::id())
             ->with(['course', 'classroom'])
             ->latest()
             ->paginate(10);
         
-        $courses = Course::where('lecturer_id', Auth::id())->get();
+        $courses = Auth::user()->courseUnits;
         $classrooms = Classroom::all();
 
-        return view('lecturer.sessions', compact('sessions', 'courses', 'classrooms'));
+        return view('lecturer.sessions', compact('sessions', 'courses', 'classrooms', 'currentWeek'));
     }
 
-    public function attendance()
+    public function attendance(Request $request)
     {
-        $logs = AttendanceLog::whereHas('session', function($q) {
-            $q->where('lecturer_id', Auth::id());
-        })
-        ->with(['student', 'session.course', 'session.classroom'])
-        ->latest()
-        ->paginate(15);
+        $courses = Auth::user()->courseUnits;
+        
+        $query = AttendanceLog::whereHas('session', function($query) {
+            $query->where('lecturer_id', Auth::id());
+        });
 
-        $courses = Course::where('lecturer_id', Auth::id())->get();
+        if ($request->filled('course_id')) {
+            $query->whereHas('session', function($q) use ($request) {
+                $q->where('course_id', $request->course_id);
+            });
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('clock_in', $request->date);
+        }
+
+        $logs = $query->with(['student', 'session.course', 'session.classroom'])->latest()->paginate(20);
 
         return view('lecturer.attendance', compact('logs', 'courses'));
     }
 
     public function reports(Request $request)
     {
-        $courses = Course::where('lecturer_id', Auth::id())->get();
+        $courses = Auth::user()->courseUnits;
         $selectedCourseId = $request->course_id ?? ($courses->first()->id ?? null);
         
         $students = Student::all(); // Assuming all students for simulation

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Student extends Model
 {
     use HasFactory;
-
+    
     protected $fillable = [
         'full_name',
         'reg_number',
@@ -17,6 +17,11 @@ class Student extends Model
         'department_id',
         'fingerprint_id',
     ];
+
+    public function getNameAttribute()
+    {
+        return $this->full_name;
+    }
 
     public function faculty()
     {

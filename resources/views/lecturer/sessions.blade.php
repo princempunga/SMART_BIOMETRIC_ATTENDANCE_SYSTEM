@@ -30,6 +30,14 @@
                     @endforeach
                 </select>
             </div>
+            <div class="w-full md:w-32 text-white">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Week</label>
+                <select name="week_number" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none">
+                    @for($i=1; $i<=16; $i++)
+                    <option value="{{ $i }}" {{ $currentWeek == $i ? 'selected' : '' }}>Wk {{ $i }}</option>
+                    @endfor
+                </select>
+            </div>
             <button type="submit" class="w-full md:w-auto bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 <span>Start Class</span>

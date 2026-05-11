@@ -27,7 +27,7 @@ class AdminController extends Controller
         $stats = [
             'students' => Student::count(),
             'lecturers' => User::where('role', 'lecturer')->count(),
-            'courses' => Course::count(),
+            'courses' => \App\Models\CourseUnit::count(),
             'classrooms' => Classroom::count(),
             'active_sessions' => \App\Models\AttendanceSession::whereNull('session_end')->count(),
             'attendance_rate' => $attendanceRate . '%',
@@ -130,10 +130,11 @@ class AdminController extends Controller
     public function storeStudent(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'full_name' => 'required|string',
             'reg_number' => 'required|string|unique:students',
-            'faculty' => 'required|string',
-            'department' => 'required|string',
+            'faculty_id' => 'required|exists:faculties,id',
+            'department_id' => 'required|exists:departments,id',
+            'fingerprint_id' => 'required|integer|unique:students',
         ]);
 
         Student::create($request->all());
@@ -143,10 +144,10 @@ class AdminController extends Controller
     public function updateStudent(Request $request, Student $student)
     {
         $request->validate([
-            'name' => 'required|string',
+            'full_name' => 'required|string',
             'reg_number' => 'required|string|unique:students,reg_number,'.$student->id,
-            'faculty' => 'required|string',
-            'department' => 'required|string',
+            'faculty_id' => 'required|exists:faculties,id',
+            'department_id' => 'required|exists:departments,id',
         ]);
 
         $student->update($request->all());
@@ -231,9 +232,29 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Classroom deleted successfully.');
     }
 
-    public function attendance()
+    public function attendance(Request $request)
     {
-        $logs = AttendanceLog::with(['student', 'session.course', 'session.classroom'])->latest()->paginate(15);
+        $query = AttendanceLog::with(['student', 'session.course', 'session.classroom']);
+
+        if ($request->filled('course_id')) {
+            $query->whereHas('session', function($q) use ($request) {
+                $q->where('course_id', $request->course_id);
+            });
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('clock_in', $request->date);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status == 'out') {
+                $query->whereNotNull('clock_out');
+            } else {
+                $query->whereNull('clock_out');
+            }
+        }
+
+        $logs = $query->latest()->paginate(15);
         $courses = Course::all();
         return view('admin.attendance', compact('logs', 'courses'));
     }

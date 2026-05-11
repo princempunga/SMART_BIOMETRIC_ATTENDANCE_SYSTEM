@@ -10,7 +10,7 @@ class AttendanceSession extends Model
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(CourseUnit::class, 'course_id');
     }
 
     public function lecturer()
@@ -51,5 +51,13 @@ class AttendanceSession extends Model
     public function isExpired()
     {
         return $this->status === 'expired';
+    }
+
+    public function getDurationAttribute()
+    {
+        if ($this->session_start && $this->session_end) {
+            return \Carbon\Carbon::parse($this->session_start)->diffInMinutes(\Carbon\Carbon::parse($this->session_end));
+        }
+        return 0;
     }
 }

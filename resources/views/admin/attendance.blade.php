@@ -6,29 +6,29 @@
 <div class="space-y-6">
     <!-- Filters -->
     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-        <form class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form method="GET" action="{{ route('admin.attendance') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Course</label>
-                <select class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
+                <select name="course_id" class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
                     <option value="">All Courses</option>
                     @foreach($courses as $course)
-                    <option value="{{ $course->id }}">{{ $course->course_name }}</option>
+                    <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>{{ $course->course_name }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Date</label>
-                <input type="date" class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
+                <input type="date" name="date" value="{{ request('date') }}" class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Status</label>
-                <select class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
+                <select name="status" class="w-full px-4 py-2 rounded-lg bg-slate-50 border-slate-100 text-sm focus:ring-2 focus:ring-blue-500/10 outline-none">
                     <option value="">All Statuses</option>
-                    <option value="in">In Class</option>
-                    <option value="out">Completed</option>
+                    <option value="in" {{ request('status') == 'in' ? 'selected' : '' }}>In Class</option>
+                    <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Completed</option>
                 </select>
             </div>
-            <button type="button" class="bg-[#2563EB] text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-[#1D4ED8] transition-all">Filter Results</button>
+            <button type="submit" class="bg-[#2563EB] text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-[#1D4ED8] transition-all">Filter Results</button>
         </form>
     </div>
 

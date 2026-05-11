@@ -70,6 +70,8 @@ class AttendanceSimulationController extends Controller
             'session_id' => $session->id,
             'student_id' => $request->student_id,
             'clock_in' => Carbon::now(),
+            'week_number' => $session->week_number,
+            'semester_id' => 'SEM1-2026', // Dynamic based on app settings usually
             'attendance_status' => 'present'
         ]);
 

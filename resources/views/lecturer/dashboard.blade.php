@@ -58,7 +58,7 @@
         <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#8B5CF6] flex justify-between items-start">
             <div>
                 <p class="text-[#94A3B8] text-sm font-medium">Total Logs</p>
-                <h3 class="text-3xl font-bold text-[#0F172A] mt-1">1,248</h3>
+                <h3 class="text-3xl font-bold text-[#0F172A] mt-1">{{ number_format($stats['total_logs']) }}</h3>
                 <span class="text-[10px] font-bold text-[#8B5CF6] mt-2 inline-block bg-purple-50 px-2 py-0.5 rounded uppercase tracking-wider">Verified</span>
             </div>
             <div class="w-10 h-10 bg-[#8B5CF6]/10 rounded-full flex items-center justify-center text-[#8B5CF6]">
@@ -99,25 +99,33 @@
                     <h4 class="text-xl font-bold mb-2">Start Session</h4>
                     <p class="text-slate-400 text-xs mb-8 leading-relaxed italic">Select your scheduled class to begin attendance tracking.</p>
                     
-                    <form action="{{ route('lecturer.sessions.start') }}" method="POST" class="space-y-6">
+                    <form action="{{ route('lecturer.sessions.start') }}" method="POST" class="space-y-4">
                         @csrf
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Select Course</label>
-                                <select name="course_id" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none">
-                                    <option value="" disabled selected>Choose a course...</option>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Academic Course</label>
+                                <select name="course_id" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none text-white">
+                                    <option value="" disabled selected>Choose assigned course...</option>
                                     @foreach($courses as $course)
                                     <option value="{{ $course->id }}">{{ $course->course_name }} ({{ $course->course_code }})</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Select Classroom</label>
-                                <select name="classroom_id" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none">
-                                    <option value="" disabled selected>Choose a room...</option>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Classroom</label>
+                                <select name="classroom_id" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none text-white">
+                                    <option value="" disabled selected>Select Room</option>
                                     @foreach($classrooms as $classroom)
                                     <option value="{{ $classroom->id }}">{{ $classroom->room_name }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Academic Week</label>
+                                <select name="week_number" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none text-white">
+                                    @for($i=1; $i<=16; $i++)
+                                    <option value="{{ $i }}" {{ $stats['current_week'] == $i ? 'selected' : '' }}>Week {{ $i }}</option>
+                                    @endfor
                                 </select>
                             </div>
                         </div>
