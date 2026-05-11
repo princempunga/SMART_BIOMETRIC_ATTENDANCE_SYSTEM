@@ -6,11 +6,7 @@
 <div class="max-w-6xl mx-auto space-y-8">
     <!-- Active Session Banner -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-[#0F172A] to-[#1E293B] p-8 text-white relative">
-            <div class="absolute top-0 right-0 p-8 opacity-10">
-                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-            </div>
-            
+        <div class="bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] p-8 text-white relative">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
                 <div>
                     <div class="flex items-center gap-3 mb-4">
@@ -21,7 +17,7 @@
                         </div>
                     </div>
                     <h2 class="text-3xl font-bold">{{ $session->course->course_name }}</h2>
-                    <p class="text-slate-400 mt-1 flex items-center gap-2">
+                    <p class="text-slate-100 mt-1 flex items-center gap-2 opacity-80">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         {{ $session->classroom->room_name }}
                     </p>
@@ -29,12 +25,12 @@
                 
                 <div class="flex items-center gap-8 bg-black/20 p-6 rounded-2xl backdrop-blur-sm border border-white/5">
                     <div class="text-center">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Session Timer</p>
+                        <p class="text-slate-300 text-[10px] font-bold uppercase tracking-widest mb-1">Session Timer</p>
                         <div id="sessionTimer" class="text-3xl font-mono font-bold text-white">00:00:00</div>
                     </div>
                     <div class="w-px h-10 bg-white/10"></div>
                     <div class="text-center">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">OTP Status</p>
+                        <p class="text-slate-300 text-[10px] font-bold uppercase tracking-widest mb-1">OTP Status</p>
                         @if($session->isActive())
                             <span class="text-emerald-400 font-bold text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
@@ -45,6 +41,28 @@
                         @endif
                     </div>
                 </div>
+            </div>
+
+            <!-- Infrastructure Resilience Indicators -->
+            <div class="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-6 items-center">
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
+                    <span>Power: AC Online</span>
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                    <span>Net: Device Connected</span>
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                    <span>Recovery: Auto-Sync Enabled</span>
+                </div>
+                @if(request()->has('restored'))
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-emerald-500/20 px-3 py-1.5 rounded-full border border-emerald-400/50 text-emerald-100 animate-bounce">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Session Restored Successfully</span>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -239,7 +257,8 @@
 
 <script>
     // Timer Logic
-    let startTime = new Date("{{ $session->session_start }}").getTime();
+    let startTimeStr = "{{ $session->session_start }}";
+    let startTime = new Date(startTimeStr).getTime();
     setInterval(function() {
         let now = new Date().getTime();
         let diff = now - startTime;

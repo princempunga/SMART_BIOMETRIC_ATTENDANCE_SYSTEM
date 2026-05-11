@@ -25,11 +25,11 @@ class CourseUnit extends Model
 
     public function sessions()
     {
-        return $this->hasMany(AttendanceSession::class, 'course_id');
+        return $this->hasMany(AttendanceSession::class, 'course_unit_id');
     }
 
     public function timetables()
     {
-        return $this->hasMany(Timetable::class, 'course_id');
+        return $this->hasMany(Timetable::class, 'course_unit_id');
     }
 }

@@ -15,7 +15,8 @@ class AttendanceLog extends Model
         'attendance_status',
         'attendance_mark',
         'week_number',
-        'semester_id'
+        'semester_id',
+        'is_offline_sync'
     ];
 
     public function calculateDurationAndMark($sessionDuration)

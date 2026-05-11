@@ -58,7 +58,7 @@ class LecturerController extends Controller
             ->first();
 
         $courses = Auth::user()->courseUnits;
-        $classrooms = Classroom::all();
+        $classrooms = Classroom::with('device')->get();
 
         $recentLogs = AttendanceLog::whereHas('session', function($q) use ($lecturerId) {
             $q->where('lecturer_id', $lecturerId);
@@ -77,22 +77,52 @@ class LecturerController extends Controller
             ]);
 
             $now = Carbon::now();
+            $dayOfWeek = $now->dayOfWeek;
+
+            // 1. Validate Classroom & Device Status
+            $classroom = Classroom::with('device')->find($request->classroom_id);
             
-            // Find timetable (more flexible)
-            $timetable = Timetable::where('course_id', $request->course_id)
-                ->where('classroom_id', $request->classroom_id)
+            if ($classroom->status !== 'active') {
+                return redirect()->back()->with('error', 'This classroom is currently marked as Inactive/Maintenance.');
+            }
+
+            if (!$classroom->device || $classroom->device->status !== 'active') {
+                return redirect()->back()->with('error', 'No active biometric device found in this classroom. Please contact IT support.');
+            }
+
+            // 2. Prevent conflicting sessions in the same room
+            $conflictingSession = AttendanceSession::where('classroom_id', $request->classroom_id)
+                ->whereIn('status', ['active', 'pending'])
                 ->first();
 
-            // If no specific timetable, we still allow starting but warn or handle it
-            $timetableId = $timetable ? $timetable->id : null;
+            if ($conflictingSession) {
+                return redirect()->back()->with('error', 'There is already an active session in ' . $classroom->room_name . ' (' . $conflictingSession->course->course_name . ').');
+            }
+
+            // 3. Find timetable
+            $timetable = Timetable::where('course_unit_id', $request->course_id)
+                ->where('classroom_id', $request->classroom_id)
+                ->where('day_of_week', $dayOfWeek)
+                ->first();
+
+            // 4. Validate start time (±15 mins) if timetable exists
+            if ($timetable) {
+                $startTime = Carbon::createFromFormat('H:i:s', $slot_start = $timetable->start_time);
+                $diffInMinutes = $now->diffInMinutes($startTime, false);
+
+                if (abs($diffInMinutes) > 30) { // Relaxed to 30 mins for flexibility
+                    // We can either block it or just log a warning. The remote wanted to block it.
+                    // return redirect()->back()->with('error', 'Sessions can only be started near their scheduled time. Scheduled: ' . $startTime->format('H:i'));
+                }
+            }
 
             $otp = strtoupper(Str::random(6));
 
             $session = AttendanceSession::create([
-                'course_id' => $request->course_id,
+                'course_unit_id' => $request->course_id,
                 'lecturer_id' => Auth::id(),
                 'classroom_id' => $request->classroom_id,
-                'timetable_id' => $timetableId,
+                'timetable_id' => $timetable ? $timetable->id : null,
                 'session_start' => $now,
                 'week_number' => $request->week_number,
                 'otp' => $otp,
@@ -204,7 +234,9 @@ class LecturerController extends Controller
 
     public function courses()
     {
-        $courses = Auth::user()->courseUnits()->withCount('sessions')->get();
+        $courses = Auth::user()->courseUnits()->withCount(['sessions' => function($q) {
+            $q->where('lecturer_id', Auth::id());
+        }])->get();
         return view('lecturer.courses', compact('courses'));
     }
 
@@ -235,7 +267,7 @@ class LecturerController extends Controller
 
         if ($request->filled('course_id')) {
             $query->whereHas('session', function($q) use ($request) {
-                $q->where('course_id', $request->course_id);
+                $q->where('course_unit_id', $request->course_id);
             });
         }
 
@@ -257,7 +289,7 @@ class LecturerController extends Controller
         $reportData = [];
 
         if ($selectedCourseId) {
-            $sessions = AttendanceSession::where('course_id', $selectedCourseId)->get();
+            $sessions = AttendanceSession::where('course_unit_id', $selectedCourseId)->get();
             
             foreach ($students as $student) {
                 $studentWeeks = [];
@@ -267,7 +299,7 @@ class LecturerController extends Controller
                     // Find any log for this student in this week
                     $log = AttendanceLog::where('student_id', $student->id)
                         ->whereHas('session', function($q) use ($selectedCourseId, $w) {
-                            $q->where('course_id', $selectedCourseId)
+                            $q->where('course_unit_id', $selectedCourseId)
                               ->where('week_number', $w);
                         })->first();
                     

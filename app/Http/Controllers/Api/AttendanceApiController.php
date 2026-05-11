@@ -122,4 +122,60 @@ class AttendanceApiController extends Controller
             'message' => 'Enrolled: ' . $student->full_name
         ]);
     }
+    public function sync(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|integer',
+            'logs' => 'required|array',
+            'logs.*.fingerprint_id' => 'required|integer',
+            'logs.*.timestamp' => 'required|date',
+            'logs.*.type' => 'required|in:clock_in,clock_out',
+        ]);
+
+        $session = AttendanceSession::find($request->session_id);
+        if (!$session) return response()->json(['message' => 'Session not found'], 404);
+
+        $syncedCount = 0;
+        foreach ($request->logs as $logData) {
+            $student = Student::where('fingerprint_id', $logData['fingerprint_id'])->first();
+            if (!$student) continue;
+
+            // Check for existing log to prevent duplicates during sync
+            $exists = AttendanceLog::where('student_id', $student->id)
+                ->where('session_id', $session->id)
+                ->where('clock_in', $logData['timestamp'])
+                ->exists();
+
+            if (!$exists) {
+                AttendanceLog::create([
+                    'student_id' => $student->id,
+                    'session_id' => $session->id,
+                    'clock_in' => $logData['timestamp'],
+                    'attendance_status' => 'present',
+                    'is_offline_sync' => true // Metadata to track sync
+                ]);
+                $syncedCount++;
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Synchronized $syncedCount logs",
+            'total_in_session' => $session->attendanceLogs()->count()
+        ]);
+    }
+
+    public function getStudentCache(Request $request)
+    {
+        $request->validate(['device_code' => 'required|string']);
+        
+        // Return students relevant to this device's classroom (or just all for simplicity in simulation)
+        $students = Student::select('id', 'full_name', 'reg_number', 'fingerprint_id')->get();
+        
+        return response()->json([
+            'status' => 'success',
+            'count' => $students->count(),
+            'students' => $students
+        ]);
+    }
 }

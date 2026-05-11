@@ -3,10 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Classroom extends Model
 {
-    protected $fillable = ['room_name'];
+    use HasFactory;
+
+    protected $fillable = [
+        'room_name',
+        'room_code',
+        'building_name',
+        'floor_number',
+        'seating_capacity',
+        'status'
+    ];
 
     public function device()
     {
