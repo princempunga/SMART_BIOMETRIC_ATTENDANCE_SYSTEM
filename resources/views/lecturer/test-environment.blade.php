@@ -73,13 +73,19 @@
                 <div class="mt-8 pt-8 border-t border-slate-100">
                     <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Select Target Session</h4>
                     <div class="space-y-2">
+                        @php
+                            $targetId = request()->target_session;
+                        @endphp
                         @foreach($activeSessions as $s)
-                        <label class="flex items-center p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50 gap-3">
-                            <input type="radio" name="session_id" value="{{ $s->id }}" {{ $loop->first ? 'checked' : '' }} onchange="updateTarget({{ $s->id }}, '{{ $s->course->course_name }}')">
-                            <div>
+                        <label class="flex items-center p-3 rounded-xl border {{ $targetId == $s->id ? 'border-blue-500 bg-blue-50' : 'border-slate-100' }} cursor-pointer hover:bg-slate-50 gap-3 relative overflow-hidden group">
+                            <input type="radio" name="session_id" value="{{ $s->id }}" {{ ($targetId == $s->id || ($loop->first && !$targetId)) ? 'checked' : '' }} onchange="updateTarget({{ $s->id }}, '{{ $s->course->course_name }}')">
+                            <div class="flex-1">
                                 <p class="text-xs font-bold text-[#0F172A]">{{ $s->course->course_code }}</p>
                                 <p class="text-[9px] text-slate-500">{{ $s->classroom->room_name }}</p>
                             </div>
+                            @if($targetId == $s->id)
+                            <div class="absolute -right-2 top-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-0.5 transform rotate-12 origin-bottom-left shadow-sm">VIEWING</div>
+                            @endif
                         </label>
                         @endforeach
                     </div>
@@ -109,7 +115,13 @@
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="student-grid">
                     @foreach($students as $student)
-                    <div class="p-5 rounded-2xl border border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center text-center gap-4 group cursor-pointer" onclick="handleScan({{ $student->fingerprint_id }}, '{{ $student->full_name }}')">
+                    <div id="student-card-{{ $student->id }}" class="p-5 rounded-2xl border border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center text-center gap-4 group cursor-pointer relative overflow-hidden" onclick="handleScan({{ $student->id }}, {{ $student->fingerprint_id }}, '{{ $student->full_name }}')">
+                        <!-- Success Overlay -->
+                        <div id="scan-success-{{ $student->id }}" class="absolute inset-0 bg-emerald-500/90 flex flex-col items-center justify-center text-white opacity-0 pointer-events-none transition-all duration-300 z-10">
+                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="font-bold text-xs uppercase tracking-widest">Scanned!</span>
+                        </div>
+
                         <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-all relative">
                             <svg class="w-8 h-8 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 20m0 0c1.398 0 2.72-.273 3.928-.766l.044.083m-1.404-1.43c1.297-2.507 2.328-5.784 2.328-9.571m0 0c0-4.418-3.582-8-8-8s-8 3.582-8 8m0 0c0 3.787 1.031 7.064 2.328 9.571m11.344-9.571c0 4.418-3.582 8-8 8s-8-3.582-8-8m0 0c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path></svg>
                             <div class="absolute -top-1 -right-1 w-5 h-5 bg-[#0F172A] text-white text-[8px] flex items-center justify-center rounded-lg font-bold">{{ $student->fingerprint_id }}</div>
@@ -121,6 +133,21 @@
                     </div>
                     @endforeach
                 </div>
+            </div>
+            
+            <!-- Back to Session Button -->
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
+                @if($activeSessions->count() > 0)
+                <a href="{{ route('lecturer.sessions.active', $activeSessions->first()) }}" class="px-8 py-3 bg-[#0F172A] text-white rounded-xl font-bold text-sm flex items-center gap-3 hover:bg-black transition-all shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>Return to Active Session Dashboard</span>
+                </a>
+                @else
+                <a href="{{ route('lecturer.dashboard') }}" class="px-8 py-3 bg-[#0F172A] text-white rounded-xl font-bold text-sm flex items-center gap-3 hover:bg-black transition-all shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Return to Dashboard</span>
+                </a>
+                @endif
             </div>
         </div>
     </div>
@@ -248,16 +275,29 @@
         });
     }
 
-    function handleScan(fingerprintId, name) {
+    function handleScan(studentId, fingerprintId, name) {
         if (!isPowered) return;
         
+        if (!activeSessionId) {
+            log(`ERROR: No target session selected! Please select a session first.`, 'error');
+            alert('Please select a target session on the left panel before scanning.');
+            return;
+        }
+
         log(`SCAN: Detected Fingerprint ID: ${fingerprintId} (${name})`, 'normal');
+        
+        // Show scanning animation
+        const overlay = document.getElementById(`scan-success-${studentId}`);
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
         
         // Save current session to "Non-Volatile Memory" (localStorage)
         localStorage.setItem('active_session_id', activeSessionId);
 
         if (!isOnline) {
             const entry = {
+                session_id: activeSessionId,
+                student_id: studentId,
                 fingerprint_id: fingerprintId,
                 timestamp: new Date().toISOString(),
                 type: 'clock_in',
@@ -267,6 +307,11 @@
             localStorage.setItem('attendance_buffer', JSON.stringify(localBuffer));
             updateBufferUI();
             log(`BUFFER: Data saved to local SPIFFS. (Pending sync)`, 'info');
+            
+            setTimeout(() => {
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+            }, 1500);
             return;
         }
 
@@ -275,17 +320,34 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 session_id: activeSessionId,
-                student_id: fingerprintId // Simplification for simulation
+                student_id: studentId
             })
         })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) log(`SERVER: ${data.success}`, 'success');
-            else log(`SERVER ERROR: ${data.error}`, 'error');
+        .then(r => r.json().then(data => ({ status: r.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200) {
+                log(`SERVER: ${body.success || body.message}`, 'success');
+            } else {
+                const errorMsg = body.error || body.message || 'Validation failed';
+                log(`SERVER ERROR (${status}): ${errorMsg}`, 'error');
+                overlay.className = "absolute inset-0 bg-rose-500/90 flex flex-col items-center justify-center text-white opacity-100 z-10 transition-all";
+                overlay.innerHTML = `<svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg><span class="font-bold text-[8px] uppercase">Failed</span>`;
+            }
+            
+            setTimeout(() => {
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                // Reset for next scan
+                setTimeout(() => {
+                    overlay.className = "absolute inset-0 bg-emerald-500/90 flex flex-col items-center justify-center text-white opacity-0 pointer-events-none transition-all duration-300 z-10";
+                    overlay.innerHTML = `<svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span class="font-bold text-xs uppercase tracking-widest">Scanned!</span>`;
+                }, 300);
+            }, 1500);
         });
     }
 
