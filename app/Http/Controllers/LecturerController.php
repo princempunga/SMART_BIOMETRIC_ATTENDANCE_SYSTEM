@@ -69,36 +69,41 @@ class LecturerController extends Controller
 
     public function startSession(Request $request)
     {
-        $request->validate([
-            'course_id' => 'required|exists:course_units,id',
-            'classroom_id' => 'required|exists:classrooms,id',
-            'week_number' => 'required|integer|min:1|max:16',
-        ]);
+        try {
+            $request->validate([
+                'course_id' => 'required|exists:course_units,id',
+                'classroom_id' => 'required|exists:classrooms,id',
+                'week_number' => 'required|integer|min:1|max:16',
+            ]);
 
-        $now = Carbon::now();
-        
-        // Find timetable (more flexible)
-        $timetable = Timetable::where('course_id', $request->course_id)
-            ->where('classroom_id', $request->classroom_id)
-            ->first();
+            $now = Carbon::now();
+            
+            // Find timetable (more flexible)
+            $timetable = Timetable::where('course_id', $request->course_id)
+                ->where('classroom_id', $request->classroom_id)
+                ->first();
 
-        // If no specific timetable, we still allow starting but warn or handle it
-        $timetableId = $timetable ? $timetable->id : null;
+            // If no specific timetable, we still allow starting but warn or handle it
+            $timetableId = $timetable ? $timetable->id : null;
 
-        $otp = strtoupper(Str::random(6));
+            $otp = strtoupper(Str::random(6));
 
-        $session = AttendanceSession::create([
-            'course_id' => $request->course_id,
-            'lecturer_id' => Auth::id(),
-            'classroom_id' => $request->classroom_id,
-            'timetable_id' => $timetableId,
-            'session_start' => $now,
-            'week_number' => $request->week_number,
-            'otp' => $otp,
-            'status' => 'pending'
-        ]);
+            $session = AttendanceSession::create([
+                'course_id' => $request->course_id,
+                'lecturer_id' => Auth::id(),
+                'classroom_id' => $request->classroom_id,
+                'timetable_id' => $timetableId,
+                'session_start' => $now,
+                'week_number' => $request->week_number,
+                'otp' => $otp,
+                'status' => 'pending'
+            ]);
 
-        return redirect()->route('lecturer.sessions.active', $session)->with('success', 'Session initialized! Please verify OTP to start tracking.');
+            return redirect()->route('lecturer.sessions.active', $session)->with('success', 'Session initialized! Please verify OTP to start tracking.');
+        } catch (\Exception $e) {
+            \Log::error('Session Start Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error starting session: ' . $e->getMessage());
+        }
     }
 
     public function activeSession(AttendanceSession $session)
@@ -145,6 +150,17 @@ class LecturerController extends Controller
         return redirect()->route('lecturer.dashboard')->with('success', 'Session completed! Attendance credits have been calculated.');
     }
 
+    public function destroySession(AttendanceSession $session)
+    {
+        if ($session->lecturer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $session->delete();
+
+        return redirect()->back()->with('success', 'Session history deleted successfully.');
+    }
+
     public function getAttendanceCount(AttendanceSession $session)
     {
         return response()->json([
@@ -188,7 +204,7 @@ class LecturerController extends Controller
 
     public function courses()
     {
-        $courses = Course::where('lecturer_id', Auth::id())->withCount('sessions')->get();
+        $courses = Auth::user()->courseUnits()->withCount('sessions')->get();
         return view('lecturer.courses', compact('courses'));
     }
 

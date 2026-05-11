@@ -255,13 +255,13 @@ class AdminController extends Controller
         }
 
         $logs = $query->latest()->paginate(15);
-        $courses = Course::all();
+        $courses = \App\Models\CourseUnit::all();
         return view('admin.attendance', compact('logs', 'courses'));
     }
 
     public function reports()
     {
-        $courses = Course::all();
+        $courses = \App\Models\CourseUnit::all();
         $exports = collect([]); // Placeholder for reports history
         return view('admin.reports', compact('courses', 'exports'));
     }

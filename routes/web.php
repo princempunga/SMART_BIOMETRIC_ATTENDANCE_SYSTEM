@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->na
     Route::get('/sessions/{session}/active', [App\Http\Controllers\LecturerController::class, 'activeSession'])->name('sessions.active');
     Route::post('/sessions/{session}/verify', [App\Http\Controllers\LecturerController::class, 'verifyOtp'])->name('sessions.verify');
     Route::post('/sessions/{session}/complete', [App\Http\Controllers\LecturerController::class, 'completeSession'])->name('sessions.complete');
+    Route::delete('/sessions/{session}', [App\Http\Controllers\LecturerController::class, 'destroySession'])->name('sessions.destroy');
     Route::get('/sessions/{session}/count', [App\Http\Controllers\LecturerController::class, 'getAttendanceCount'])->name('sessions.count');
 
     // Simulation Routes
