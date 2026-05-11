@@ -192,45 +192,57 @@ class LecturerController extends Controller
         return redirect()->back()->with('success', 'Session history deleted successfully.');
     }
 
-    public function getAttendanceCount(AttendanceSession $session)
+    public function getLiveData(AttendanceSession $session)
     {
-        return response()->json([
-            'count' => $session->attendanceLogs()->count()
-        ]);
-    }
+        if ($session->lecturer_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
-    public function getAttendanceLogs(AttendanceSession $session)
-    {
         $logs = $session->attendanceLogs()
             ->with('student')
             ->latest()
-            ->get()
-            ->map(function($log) use ($session) {
-                // Calculate temporary duration if session is still active
-                $duration = $log->clock_out 
-                    ? $log->clock_in->diffInMinutes($log->clock_out) 
-                    : $log->clock_in->diffInMinutes(Carbon::now());
+            ->get();
 
-                // Calculate temporary mark
-                $scheduledDuration = $session->timetable ? Carbon::parse($session->timetable->start_time)->diffInMinutes(Carbon::parse($session->timetable->end_time)) : 60;
-                $percentage = ($duration / max($scheduledDuration, 1)) * 100;
-                $credit = 0;
-                if ($percentage >= 80) $credit = 1.0;
-                elseif ($percentage >= 50) $credit = 0.7;
-                elseif ($percentage >= 20) $credit = 0.5;
+        $scannedCount = $logs->count();
+        $inClassCount = $logs->whereNull('clock_out')->count();
+        $completedCount = $logs->whereNotNull('clock_out')->count();
+        
+        $totalEnrolled = Student::count(); // Simplification: use total students for rate
+        $attendanceRate = $totalEnrolled > 0 ? round(($scannedCount / $totalEnrolled) * 100) : 0;
 
-                return [
-                    'student_name' => $log->student->full_name,
-                    'reg_number' => $log->student->reg_number,
-                    'clock_in' => $log->clock_in->format('H:i:s'),
-                    'clock_out' => $log->clock_out ? $log->clock_out->format('H:i:s') : '—',
-                    'duration' => $duration . 'm',
-                    'status' => $log->clock_out ? 'Clocked Out' : 'In Class',
-                    'credit' => $credit
-                ];
-            });
+        $mappedLogs = $logs->map(function($log) use ($session) {
+            // Calculate temporary duration if session is still active
+            $duration = $log->clock_out 
+                ? $log->clock_in->diffInMinutes($log->clock_out) 
+                : $log->clock_in->diffInMinutes(Carbon::now());
 
-        return response()->json($logs);
+            // Calculate temporary mark
+            $scheduledDuration = $session->timetable ? Carbon::parse($session->timetable->start_time)->diffInMinutes(Carbon::parse($session->timetable->end_time)) : 60;
+            $percentage = ($duration / max($scheduledDuration, 1)) * 100;
+            
+            $credit = 0;
+            if ($percentage >= 80) $credit = 1.0;
+            elseif ($percentage >= 50) $credit = 0.7;
+            elseif ($percentage >= 20) $credit = 0.5;
+
+            return [
+                'student_name' => $log->student->full_name,
+                'reg_number' => $log->student->reg_number,
+                'clock_in' => $log->clock_in->format('H:i:s'),
+                'clock_out' => $log->clock_out ? $log->clock_out->format('H:i:s') : '—',
+                'duration' => $duration . 'm',
+                'status' => $log->clock_out ? 'Completed' : 'In Class',
+                'credit' => $credit
+            ];
+        });
+
+        return response()->json([
+            'scanned' => $scannedCount,
+            'in_class' => $inClassCount,
+            'completed' => $completedCount,
+            'rate' => $attendanceRate,
+            'logs' => $mappedLogs
+        ]);
     }
 
     public function courses()

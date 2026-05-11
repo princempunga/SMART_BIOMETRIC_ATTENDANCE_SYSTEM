@@ -120,20 +120,20 @@
                         <div>
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
                                 <span class="text-slate-400">Rate</span>
-                                <span class="text-blue-600">68%</span>
+                                <span class="text-blue-600" id="attendanceRateText">0%</span>
                             </div>
                             <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 rounded-full" style="width: 68%"></div>
+                                <div class="h-full bg-blue-500 rounded-full transition-all duration-1000" id="attendanceRateBar" style="width: 0%"></div>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4 pt-2">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <p class="text-[9px] text-slate-400 font-bold uppercase mb-1">In Class</p>
-                                <p class="text-sm font-bold text-[#0F172A]" id="inClassCount">{{ $session->attendanceLogs()->whereNull('clock_out')->count() }}</p>
+                                <p class="text-sm font-bold text-[#0F172A]" id="inClassCount">0</p>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <p class="text-[9px] text-slate-400 font-bold uppercase mb-1">Completed</p>
-                                <p class="text-sm font-bold text-[#0F172A]" id="completedCount">{{ $session->attendanceLogs()->whereNotNull('clock_out')->count() }}</p>
+                                <p class="text-sm font-bold text-[#0F172A]" id="completedCount">0</p>
                             </div>
                         </div>
                     </div>
@@ -141,114 +141,60 @@
             </div>
 
             <!-- Session Controls -->
-            <div class="p-8 flex flex-col justify-between">
-                <h3 class="font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-6">Operations</h3>
-                <div class="space-y-4">
-                    <form action="{{ route('lecturer.sessions.complete', $session) }}" method="POST">
-                        @csrf
-                        <button type="submit" onclick="return confirm('End this session? Final duration-based credits will be calculated.')" class="w-full bg-[#0F172A] hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span>End Session Now</span>
-                        </button>
-                    </form>
-                    <a href="{{ route('lecturer.test-environment') }}" target="_blank" class="w-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 text-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a2 2 0 00-1.96 1.414l-.477 2.387a2 2 0 00.547 2.022 2 2 0 002.022.547l2.387-.477a2 2 0 001.414-1.96l-.477-2.387a2 2 0 00-2.022-.547z"></path></svg>
-                        <span>Simulator Panel</span>
-                    </a>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-6 leading-relaxed italic text-center">Ending the session will calculate attendance percentages based on each student's time in the classroom.</p>
+            <div class="p-8 flex flex-col items-center justify-center space-y-4">
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Controls</p>
+                <form action="{{ route('lecturer.sessions.complete', $session) }}" method="POST" class="w-full">
+                    @csrf
+                    <button type="submit" onclick="return confirm('End this session? No more attendance will be recorded.')" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>End Session Now</span>
+                    </button>
+                </form>
+                <a href="{{ route('lecturer.test-environment') }}?target_session={{ $session->id }}" target="_blank" class="w-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-3 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a2 2 0 00-1.96 1.414l-.477 2.387a2 2 0 00.547 2.022 2 2 0 002.022.547l2.387-.477a2 2 0 001.414-1.96l-.477-2.387a2 2 0 00-2.022-.547z"></path></svg>
+                    <span>Simulator Panel</span>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Live Attendance Table -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <!-- Live Log -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mt-8">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                <h3 class="font-bold text-[#0F172A]">Real-time Academic Stream</h3>
+            <h3 class="font-bold text-[#0F172A] flex items-center gap-3">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                </span>
+                <span>Real-time Academic Stream</span>
+            </h3>
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">Auto-updating every 5s</span>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Auto-updating every 5s</span>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
+        
+        <div class="overflow-x-auto no-scrollbar">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 text-[10px] font-bold text-[#475569] uppercase tracking-wider border-b border-slate-100">
-                        <th class="px-8 py-5">Student Details</th>
-                        <th class="px-8 py-5">Time Log</th>
-                        <th class="px-8 py-5 text-center">Current Duration</th>
-                        <th class="px-8 py-5">Status</th>
-                        <th class="px-8 py-5 text-right">Est. Credit</th>
+                    <tr class="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <th class="px-8 py-4">Student Details</th>
+                        <th class="px-8 py-4">Time Log (In/Out)</th>
+                        <th class="px-8 py-4 text-center">Current Duration</th>
+                        <th class="px-8 py-4">Status</th>
+                        <th class="px-8 py-4 text-right">Est. Credit</th>
                     </tr>
                 </thead>
-                <tbody id="attendanceLogs" class="divide-y divide-slate-100">
-                    @forelse($session->attendanceLogs()->with('student')->latest()->get() as $log)
-                    <tr class="hover:bg-blue-50/30 transition-colors">
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] font-bold text-sm">
-                                    {{ substr($log->student->full_name, 0, 1) }}
-                                </div>
-                                <div>
-                                    <div class="font-bold text-[#0F172A] text-sm">{{ $log->student->full_name }}</div>
-                                    <div class="text-[11px] text-slate-400">{{ $log->student->reg_number }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-4">
-                                <div class="text-center">
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">In</p>
-                                    <p class="font-mono text-xs font-bold text-[#2563EB]">{{ $log->clock_in->format('H:i') }}</p>
-                                </div>
-                                <div class="text-slate-300">→</div>
-                                <div class="text-center">
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">Out</p>
-                                    <p class="font-mono text-xs font-bold {{ $log->clock_out ? 'text-[#2563EB]' : 'text-slate-300' }}">
-                                        {{ $log->clock_out ? $log->clock_out->format('H:i') : '--:--' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5 text-center">
-                            @php
-                                $dur = $log->clock_out ? $log->clock_in->diffInMinutes($log->clock_out) : $log->clock_in->diffInMinutes(now());
-                            @endphp
-                            <span class="text-sm font-bold text-[#0F172A]">{{ $dur }}</span>
-                            <span class="text-[10px] text-slate-400 font-medium ml-0.5">mins</span>
-                        </td>
-                        <td class="px-8 py-5">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold {{ $log->clock_out ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600 animate-pulse' }} uppercase tracking-wider">
-                                {{ $log->clock_out ? 'Clocked Out' : 'Active' }}
-                            </span>
-                        </td>
-                        <td class="px-8 py-5 text-right">
-                            @php
-                                $sched = $session->timetable ? \Carbon\Carbon::parse($session->timetable->start_time)->diffInMinutes(\Carbon\Carbon::parse($session->timetable->end_time)) : 60;
-                                $perc = ($dur / max($sched, 1)) * 100;
-                                $c = 0;
-                                if($perc >= 80) $c = 1.0; elseif($perc >= 50) $c = 0.7; elseif($perc >= 20) $c = 0.5;
-                            @endphp
-                            <div class="flex flex-col items-end">
-                                <span class="text-lg font-black {{ $c >= 1.0 ? 'text-emerald-600' : ($c >= 0.5 ? 'text-orange-500' : 'text-red-500') }}">
-                                    {{ number_format($c, 1) }}
-                                </span>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ round($perc) }}% Coverage</span>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
+                <tbody id="attendanceLogs">
                     <tr>
-                        <td colspan="5" class="px-8 py-20 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
+                        <td colspan="5" class="py-24 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
-                                <p class="text-slate-400 text-sm font-medium italic">No attendance records detected for this session yet.</p>
+                                <p class="text-slate-400 text-sm italic font-medium">Initializing academic stream...</p>
                             </div>
                         </td>
                     </tr>
-                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -257,8 +203,8 @@
 
 <script>
     // Timer Logic
-    let startTimeStr = "{{ $session->session_start }}";
-    let startTime = new Date(startTimeStr).getTime();
+    const startTimeStr = "{{ $session->session_start }}";
+    const startTime = new Date(startTimeStr).getTime();
     setInterval(function() {
         let now = new Date().getTime();
         let diff = now - startTime;
@@ -271,90 +217,88 @@
             (seconds < 10 ? "0" + seconds : seconds);
     }, 1000);
 
-    // AJAX Polling
-    let enrolledCount = 45;
-    let circleTotal = 364.4;
+    // Global Constants
+    const circleTotal = 364.4;
+    const enrolledCount = {{ \App\Models\Student::count() > 0 ? \App\Models\Student::count() : 45 }};
 
     function updateAttendance() {
-        fetch("{{ route('lecturer.sessions.count', $session) }}")
+        fetch("{{ route('lecturer.sessions.live-data', $session) }}")
             .then(response => response.json())
             .then(data => {
-                let count = data.count;
-                document.getElementById('attendanceCount').innerText = count;
-                let offset = circleTotal - (count / enrolledCount * circleTotal);
+                // Update Counters
+                document.getElementById('attendanceCount').innerText = data.scanned;
+                document.getElementById('inClassCount').innerText = data.in_class;
+                document.getElementById('completedCount').innerText = data.completed;
+                document.getElementById('attendanceRateText').innerText = data.rate + '%';
+                document.getElementById('attendanceRateBar').style.width = data.rate + '%';
+                
+                // Update Circle
+                let offset = circleTotal - (data.scanned / enrolledCount * circleTotal);
                 document.getElementById('attendanceCircle').style.strokeDashoffset = offset;
-            });
 
-        fetch("{{ route('lecturer.sessions.logs', $session) }}")
-            .then(response => response.json())
-            .then(data => {
+                // Update Logs
                 const logsContainer = document.getElementById('attendanceLogs');
-                if (data.length > 0) {
+                if (data.logs.length > 0) {
                     let html = '';
-                    let inClassCount = 0;
-                    let completedCount = 0;
-
-                    data.forEach(log => {
-                        if (log.status === 'In Class') inClassCount++;
-                        else completedCount++;
-
-                        const creditColor = log.credit >= 1.0 ? 'text-emerald-600' : (log.credit >= 0.5 ? 'text-orange-500' : 'text-red-500');
+                    data.logs.forEach(log => {
                         const statusClass = log.status === 'In Class' ? 'bg-blue-50 text-blue-600 animate-pulse' : 'bg-emerald-50 text-emerald-600';
-                        const clockOutColor = log.clock_out === '—' ? 'text-slate-300' : 'text-[#2563EB]';
-
+                        const creditColor = log.credit >= 1.0 ? 'text-emerald-600' : (log.credit >= 0.5 ? 'text-orange-500' : 'text-slate-600');
+                        
                         html += `
-                            <tr class="hover:bg-blue-50/30 transition-colors">
-                                <td class="px-8 py-5">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] font-bold text-sm">
+                            <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
+                                <td class="px-8 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] font-bold text-xs group-hover:bg-white transition-colors">
                                             ${log.student_name.charAt(0)}
                                         </div>
                                         <div>
-                                            <div class="font-bold text-[#0F172A] text-sm">${log.student_name}</div>
-                                            <div class="text-[11px] text-slate-400">${log.reg_number}</div>
+                                            <p class="font-bold text-sm text-[#0F172A]">${log.student_name}</p>
+                                            <p class="text-[10px] text-slate-400 font-medium">${log.reg_number}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-8 py-5">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-center">
-                                            <p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">In</p>
-                                            <p class="font-mono text-xs font-bold text-[#2563EB]">${log.clock_in.substring(0, 5)}</p>
-                                        </div>
+                                <td class="px-8 py-4">
+                                    <div class="flex items-center gap-4 font-mono text-xs">
+                                        <div class="text-blue-600 font-bold">${log.clock_in}</div>
                                         <div class="text-slate-300">→</div>
-                                        <div class="text-center">
-                                            <p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">Out</p>
-                                            <p class="font-mono text-xs font-bold ${clockOutColor}">${log.clock_out.substring(0, 5)}</p>
-                                        </div>
+                                        <div class="${log.clock_out === '—' ? 'text-slate-300' : 'text-[#0F172A] font-bold'}">${log.clock_out}</div>
                                     </div>
                                 </td>
-                                <td class="px-8 py-5 text-center">
-                                    <span class="text-sm font-bold text-[#0F172A]">${log.duration.replace('m', '')}</span>
-                                    <span class="text-[10px] text-slate-400 font-medium ml-0.5">mins</span>
+                                <td class="px-8 py-4 text-center">
+                                    <span class="text-sm font-bold text-slate-600">${log.duration}</span>
                                 </td>
-                                <td class="px-8 py-5">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${statusClass} uppercase tracking-wider">
+                                <td class="px-8 py-4">
+                                    <span class="px-3 py-1 ${statusClass} rounded-lg text-[9px] font-bold uppercase tracking-widest border border-current">
                                         ${log.status}
                                     </span>
                                 </td>
-                                <td class="px-8 py-5 text-right">
-                                    <div class="flex flex-col items-end">
-                                        <span class="text-lg font-black ${creditColor}">${log.credit.toFixed(1)}</span>
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Est. Credit</span>
-                                    </div>
+                                <td class="px-8 py-4 text-right">
+                                    <span class="text-sm font-black ${creditColor}">${log.credit.toFixed(1)}</span>
                                 </td>
                             </tr>
                         `;
                     });
                     logsContainer.innerHTML = html;
-                    document.getElementById('inClassCount').innerText = inClassCount;
-                    document.getElementById('completedCount').innerText = completedCount;
+                } else {
+                    logsContainer.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="py-24 text-center">
+                                <p class="text-slate-400 text-sm italic font-medium">No attendance records detected for this session yet.</p>
+                            </td>
+                        </tr>
+                    `;
                 }
-            });
+            })
+            .catch(error => console.error('Error fetching live data:', error));
     }
 
     @if($session->isActive())
+    updateAttendance();
     setInterval(updateAttendance, 5000);
     @endif
 </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
 @endsection
