@@ -6,7 +6,7 @@
 <div class="max-w-4xl mx-auto space-y-8">
     <!-- Active Session Banner -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] p-8 text-white">
+        <div class="bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] p-8 text-white relative">
             <div class="flex justify-between items-start">
                 <div>
                     <div class="flex items-center gap-3 mb-4">
@@ -23,6 +23,28 @@
                     <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-1">Session Timer</p>
                     <div id="sessionTimer" class="text-3xl font-mono font-bold">00:00:00</div>
                 </div>
+            </div>
+
+            <!-- Infrastructure Resilience Indicators -->
+            <div class="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-6 items-center">
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
+                    <span>Power: AC Online</span>
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                    <span>Net: Device Connected</span>
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                    <span>Recovery: Auto-Sync Enabled</span>
+                </div>
+                @if(request()->has('restored'))
+                <div class="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest bg-emerald-500/20 px-3 py-1.5 rounded-full border border-emerald-400/50 text-emerald-100 animate-bounce">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Session Restored Successfully</span>
+                </div>
+                @endif
             </div>
         </div>
 

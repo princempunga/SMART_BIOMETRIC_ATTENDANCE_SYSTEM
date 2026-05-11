@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttendanceLog extends Model
 {
-    protected $fillable = ['student_id', 'session_id', 'clock_in', 'clock_out', 'duration', 'attendance_status'];
+    protected $fillable = ['student_id', 'session_id', 'clock_in', 'clock_out', 'duration', 'attendance_status', 'is_offline_sync'];
 
     protected $casts = [
         'clock_in' => 'datetime',

@@ -12,8 +12,9 @@ class DeviceController extends Controller
 {
     public function index()
     {
-        $devices = Device::all();
-        return view('admin.devices.index', compact('devices'));
+        $devices = Device::with('classroom')->get();
+        $classrooms = \App\Models\Classroom::all();
+        return view('admin.devices.index', compact('devices', 'classrooms'));
     }
 
     public function create()

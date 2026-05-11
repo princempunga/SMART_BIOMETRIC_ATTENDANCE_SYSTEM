@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Timetable extends Model
 {
-    protected $fillable = ['course_id', 'classroom_id', 'day_of_week', 'start_time', 'end_time'];
+    protected $fillable = ['course_unit_id', 'classroom_id', 'day_of_week', 'start_time', 'end_time'];
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(CourseUnit::class, 'course_unit_id');
     }
 
     public function classroom()
