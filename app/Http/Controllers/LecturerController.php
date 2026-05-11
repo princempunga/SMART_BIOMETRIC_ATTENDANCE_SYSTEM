@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Course;
+use App\Models\CourseUnit;
 use App\Models\AttendanceSession;
 use App\Models\AttendanceLog;
 use App\Models\Classroom;
@@ -285,38 +286,95 @@ class LecturerController extends Controller
         $courses = Auth::user()->courseUnits;
         $selectedCourseId = $request->course_id ?? ($courses->first()->id ?? null);
         
-        $students = Student::all(); // Assuming all students for simulation
+        $data = $this->getReportData($selectedCourseId);
+        $reportData = $data['reportData'];
+        $weeksWithSessions = $data['weeksWithSessions'];
+
+        return view('lecturer.reports', compact('courses', 'reportData', 'selectedCourseId', 'weeksWithSessions'));
+    }
+
+    public function downloadReport(Request $request)
+    {
+        $courses = Auth::user()->courseUnits;
+        $selectedCourseId = $request->course_id;
+        
+        if (!$selectedCourseId) {
+            return redirect()->back()->with('error', 'Please select a course first.');
+        }
+
+        $course = CourseUnit::find($selectedCourseId);
+        $data = $this->getReportData($selectedCourseId);
+        $reportData = $data['reportData'];
+        $weeksWithSessions = $data['weeksWithSessions'];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('lecturer.reports-pdf', [
+            'course' => $course,
+            'reportData' => $reportData,
+            'weeksWithSessions' => $weeksWithSessions,
+            'lecturer' => Auth::user()
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('Attendance_Report_' . $course->course_code . '.pdf');
+    }
+
+    private function getReportData($selectedCourseId)
+    {
         $reportData = [];
+        $weeksWithSessions = [];
 
         if ($selectedCourseId) {
-            $sessions = AttendanceSession::where('course_unit_id', $selectedCourseId)->get();
+            $course = CourseUnit::find($selectedCourseId);
             
+            // Filter students: only those in the same department OR who have logs for this course
+            $students = Student::where('department_id', $course->department_id)
+                ->orWhereHas('attendanceLogs.session', function($q) use ($selectedCourseId) {
+                    $q->where('course_unit_id', $selectedCourseId);
+                })->get();
+
+            $weeksWithSessions = AttendanceSession::where('course_unit_id', $selectedCourseId)
+                ->distinct()
+                ->pluck('week_number')
+                ->toArray();
+            
+            $totalRecordedWeeks = 16; 
+
             foreach ($students as $student) {
                 $studentWeeks = [];
                 $totalDuration = 0;
+                $presentWeeksCount = 0;
                 
                 for ($w = 1; $w <= 16; $w++) {
-                    // Find any log for this student in this week
                     $log = AttendanceLog::where('student_id', $student->id)
                         ->whereHas('session', function($q) use ($selectedCourseId, $w) {
                             $q->where('course_unit_id', $selectedCourseId)
                               ->where('week_number', $w);
                         })->first();
                     
-                    $studentWeeks[$w] = $log ? true : false;
+                    $isPresent = $log ? true : false;
+                    $studentWeeks[$w] = $isPresent;
                     $totalDuration += $log ? ($log->duration ?? 0) : 0;
+                    
+                    if ($isPresent) {
+                        $presentWeeksCount++;
+                    }
                 }
                 
+                $scoreOutOf5 = ($presentWeeksCount / $totalRecordedWeeks) * 5;
+
                 $reportData[] = [
                     'student' => $student,
                     'weeks' => $studentWeeks,
                     'total_duration' => $totalDuration,
-                    'present_count' => count(array_filter($studentWeeks)),
-                    'attendance_rate' => count($sessions) > 0 ? (count(array_filter($studentWeeks)) / count($sessions)) * 100 : 0
+                    'present_count' => $presentWeeksCount,
+                    'score_out_of_5' => round($scoreOutOf5, 2),
+                    'attendance_rate' => ($presentWeeksCount / $totalRecordedWeeks) * 100
                 ];
             }
         }
 
-        return view('lecturer.reports', compact('courses', 'reportData', 'selectedCourseId'));
+        return [
+            'reportData' => $reportData,
+            'weeksWithSessions' => $weeksWithSessions
+        ];
     }
 }

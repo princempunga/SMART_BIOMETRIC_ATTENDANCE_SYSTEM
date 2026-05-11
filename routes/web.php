@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::resource('devices', App\Http\Controllers\Admin\DeviceController::class);
     Route::resource('students', App\Http\Controllers\Admin\StudentController::class);
     Route::resource('lecturers', App\Http\Controllers\Admin\LecturerController::class);
+    Route::resource('deans', App\Http\Controllers\Admin\DeanController::class);
     
     // Existing routes that are not part of Phase 1 CRUD
     Route::get('/courses', [App\Http\Controllers\AdminController::class, 'courses'])->name('courses');
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->na
     Route::get('/sessions/{session}/logs', [App\Http\Controllers\LecturerController::class, 'getAttendanceLogs'])->name('sessions.logs');
     Route::get('/attendance', [App\Http\Controllers\LecturerController::class, 'attendance'])->name('attendance');
     Route::get('/reports', [App\Http\Controllers\LecturerController::class, 'reports'])->name('reports');
+    Route::get('/reports/download', [App\Http\Controllers\LecturerController::class, 'downloadReport'])->name('reports.download');
     
     // New Session Routes
     Route::post('/sessions/start', [App\Http\Controllers\LecturerController::class, 'startSession'])->name('sessions.start');
@@ -51,6 +53,14 @@ Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->na
     // Simulation Routes
     Route::get('/test-environment', [App\Http\Controllers\AttendanceSimulationController::class, 'index'])->name('test-environment');
     Route::post('/simulate-scan', [App\Http\Controllers\AttendanceSimulationController::class, 'simulateScan'])->name('simulate-scan');
+});
+
+Route::middleware(['auth', 'verified', 'role:dean'])->prefix('dean')->name('dean.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\DeanController::class, 'index'])->name('dashboard');
+    Route::get('/students', [App\Http\Controllers\DeanController::class, 'students'])->name('students');
+    Route::get('/lecturers', [App\Http\Controllers\DeanController::class, 'lecturers'])->name('lecturers');
+    Route::get('/attendance', [App\Http\Controllers\DeanController::class, 'attendance'])->name('attendance');
+    Route::get('/reports', [App\Http\Controllers\DeanController::class, 'reports'])->name('reports');
 });
 
 Route::middleware('auth')->group(function () {
