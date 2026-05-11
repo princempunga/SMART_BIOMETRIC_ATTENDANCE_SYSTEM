@@ -9,13 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; }
+        body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; margin: 0; padding: 0; overflow-x: hidden; }
         .sidebar { background-color: #0F172A; width: 240px; }
         .menu-item { color: #94A3B8; transition: all 0.2s; }
         .menu-item:hover { background-color: #1E293B; color: white; }
         .menu-item.active { background-color: #2563EB; color: white; }
-        .group-label { font-size: 10px; color: #475569; letter-spacing: 0.08em; padding: 20px 16px 8px; text-transform: uppercase; }
+        .group-label { font-size: 9px; color: #475569; letter-spacing: 0.1em; padding: 12px 16px 4px; text-transform: uppercase; font-weight: 700; }
         [x-cloak] { display: none !important; }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="flex min-h-screen">
@@ -32,8 +37,8 @@
 
         <hr class="border-[#1E293B] mx-4">
 
-        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-            <a href="{{ route('admin.dashboard') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+        <nav class="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto no-scrollbar">
+            <a href="{{ route('admin.dashboard') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span>Dashboard</span>
             </a>
@@ -41,48 +46,53 @@
             
             <div class="group-label">Academic Structure</div>
             
-            <a href="{{ route('admin.faculties.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.faculties.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.faculties.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.faculties.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 <span>Faculties</span>
             </a>
 
-            <a href="{{ route('admin.departments.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.departments.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.departments.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.departments.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 <span>Departments</span>
             </a>
 
+            <a href="{{ route('admin.course-units.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.course-units.*') ? 'active' : '' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <span>Course Units</span>
+            </a>
+
             <div class="group-label">Infrastructure</div>
 
-            <a href="{{ route('admin.classrooms.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.classrooms.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.classrooms.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.classrooms.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
                 <span>Classrooms</span>
             </a>
 
-            <a href="{{ route('admin.devices.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.devices.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                 <span>ESP32 Devices</span>
             </a>
 
             <div class="group-label">Users</div>
             
-            <a href="{{ route('admin.students.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.students.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <span>Students</span>
             </a>
 
-            <a href="{{ route('admin.lecturers.index') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.lecturers.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.lecturers.index') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.lecturers.*') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 <span>Lecturers</span>
             </a>
 
             <div class="group-label">Analytics</div>
 
-            <a href="{{ route('admin.attendance') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.attendance') ? 'active' : '' }}">
+            <a href="{{ route('admin.attendance') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.attendance') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 <span>Attendance Logs</span>
             </a>
 
-            <a href="{{ route('admin.reports') }}" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
+            <a href="{{ route('admin.reports') }}" class="menu-item flex items-center gap-3 px-3 py-2 rounded-md {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                 <span>Reports</span>
             </a>
@@ -91,7 +101,7 @@
         <div class="p-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors">
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     <span class="font-medium">Logout</span>
                 </button>
@@ -122,7 +132,7 @@
         </header>
 
         <!-- Content Area -->
-        <div class="p-8">
+        <div class="p-6">
             @yield('content')
         </div>
     </main>

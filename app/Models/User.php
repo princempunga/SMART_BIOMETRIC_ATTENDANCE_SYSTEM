@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->hasMany(Course::class, 'lecturer_id');
     }
 
+    public function courseUnits()
+    {
+        return $this->belongsToMany(CourseUnit::class, 'course_unit_user', 'user_id', 'course_unit_id')->withTimestamps();
+    }
+
     public function sessions()
     {
         return $this->hasMany(AttendanceSession::class, 'lecturer_id');

@@ -4,54 +4,75 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\Faculty;
+use App\Models\Department;
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreStudentRequest;
-use App\Http\Requests\UpdateStudentRequest;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
     public function index()
     {
-        $students = Student::all();
-        return view('admin.students.index', compact('students'));
+        $students = Student::with(['faculty', 'department'])->latest()->get();
+        $faculties = Faculty::all();
+        $departments = Department::all();
+        return view('admin.students.index', compact('students', 'faculties', 'departments'));
     }
 
-    public function create()
+    public function store(Request $request)
     {
-        return view('admin.students.create');
-    }
+        $data = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'reg_number' => 'required|string|unique:students,reg_number',
+            'faculty_id' => 'required|exists:faculties,id',
+            'department_id' => 'required|exists:departments,id',
+            'fingerprint_id' => 'required|integer|unique:students,fingerprint_id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg',
+        ]);
 
-    public function store(StoreStudentRequest $request)
-    {
-        $data = $request->validated();
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('student_photos', 'public');
         }
+
         Student::create($data);
-        return redirect()->route('admin.students.index')->with('success', 'Student created successfully.');
+
+        return redirect()->back()->with('success', 'Student registered successfully.');
     }
 
-    public function edit(Student $student)
+    public function update(Request $request, Student $student)
     {
-        return view('admin.students.edit', compact('student'));
-    }
+        try {
+            $data = $request->validate([
+                'full_name' => 'required|string|max:255',
+                'reg_number' => 'required|string|unique:students,reg_number,' . $student->id,
+                'faculty_id' => 'required|exists:faculties,id',
+                'department_id' => 'required|exists:departments,id',
+                'fingerprint_id' => 'required|integer|unique:students,fingerprint_id,' . $student->id,
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            session()->flash('edit_student_id', $student->id);
+            throw $e;
+        }
 
-    public function update(UpdateStudentRequest $request, Student $student)
-    {
-        $data = $request->validated();
         if ($request->hasFile('photo')) {
             if ($student->photo) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($student->photo);
+                Storage::disk('public')->delete($student->photo);
             }
             $data['photo'] = $request->file('photo')->store('student_photos', 'public');
         }
+
         $student->update($data);
-        return redirect()->route('admin.students.index')->with('success', 'Student updated successfully.');
+
+        return redirect()->back()->with('success', 'Student profile updated successfully.');
     }
 
     public function destroy(Student $student)
     {
+        if ($student->photo) {
+            Storage::disk('public')->delete($student->photo);
+        }
         $student->delete();
-        return redirect()->route('admin.students.index')->with('success', 'Student deleted successfully.');
+        return redirect()->back()->with('success', 'Student deleted successfully.');
     }
 }

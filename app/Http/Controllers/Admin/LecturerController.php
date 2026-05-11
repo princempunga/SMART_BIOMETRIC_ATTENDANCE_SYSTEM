@@ -13,8 +13,11 @@ class LecturerController extends Controller
 {
     public function index()
     {
-        $lecturers = User::where('role', 'lecturer')->with(['courses', 'faculty', 'department'])->get();
-        return view('admin.lecturers.index', compact('lecturers'));
+        $lecturers = User::where('role', 'lecturer')->with(['courseUnits', 'faculty', 'department'])->get();
+        $faculties = \App\Models\Faculty::all();
+        $departments = \App\Models\Department::all();
+        $allCourseUnits = \App\Models\CourseUnit::all();
+        return view('admin.lecturers.index', compact('lecturers', 'faculties', 'departments', 'allCourseUnits'));
     }
 
     public function create()
@@ -30,7 +33,14 @@ class LecturerController extends Controller
         if ($request->hasFile('profile_photo')) {
             $data['profile_photo'] = $request->file('profile_photo')->store('lecturer_photos', 'public');
         }
-        User::create($data);
+        
+        $lecturer = User::create($data);
+
+        // Assign course units if selected
+        if ($request->has('course_unit_ids')) {
+            $lecturer->courseUnits()->sync($request->course_unit_ids);
+        }
+
         return redirect()->route('admin.lecturers.index')->with('success', 'Lecturer created successfully.');
     }
 
@@ -53,7 +63,16 @@ class LecturerController extends Controller
             }
             $data['profile_photo'] = $request->file('profile_photo')->store('lecturer_photos', 'public');
         }
+        
         $lecturer->update($data);
+
+        // Reassign course units
+        if ($request->has('course_unit_ids')) {
+            $lecturer->courseUnits()->sync($request->course_unit_ids);
+        } else {
+            $lecturer->courseUnits()->detach();
+        }
+
         return redirect()->route('admin.lecturers.index')->with('success', 'Lecturer updated successfully.');
     }
 

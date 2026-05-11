@@ -26,6 +26,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/attendance', [App\Http\Controllers\AdminController::class, 'attendance'])->name('attendance');
     Route::get('/reports', [App\Http\Controllers\AdminController::class, 'reports'])->name('reports');
     Route::post('/reports/generate', [App\Http\Controllers\AdminController::class, 'generateReport'])->name('reports.generate');
+    Route::get('/simulate-data', [App\Http\Controllers\AttendanceSimulationController::class, 'seedDemoData'])->name('simulate-data');
+    
+    Route::resource('course-units', App\Http\Controllers\Admin\CourseUnitController::class);
+    Route::get('/api/faculties/{faculty}/course-units', [App\Http\Controllers\Admin\CourseUnitController::class, 'getByFaculty']);
 });
 
 Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {

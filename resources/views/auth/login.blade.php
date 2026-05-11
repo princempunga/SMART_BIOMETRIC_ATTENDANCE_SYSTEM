@@ -43,6 +43,12 @@
             z-index: -2;
         }
         [x-cloak] { display: none !important; }
+        
+        /* Hide browser-default password reveal button (Edge/IE) */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 relative">

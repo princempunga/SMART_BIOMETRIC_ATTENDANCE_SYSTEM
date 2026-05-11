@@ -7,12 +7,12 @@
     <!-- Generate Report -->
     <div class="lg:col-span-1 space-y-6">
         <h3 class="font-bold text-[#0F172A] px-1">Generate New Report</h3>
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-            <form action="{{ route('admin.reports.generate') }}" method="POST" class="space-y-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <form action="{{ route('admin.reports.generate') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Select Course</label>
-                    <select name="course_id" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium appearance-none">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Select Course</label>
+                    <select name="course_id" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-xs appearance-none">
                         <option value="">All Courses</option>
                         @foreach($courses as $course)
                         <option value="{{ $course->id }}">{{ $course->course_name }}</option>
@@ -20,39 +20,52 @@
                     </select>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Date From</label>
-                        <input type="date" name="from_date" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Date From</label>
+                        <input type="date" name="from_date" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Date To</label>
-                        <input type="date" name="to_date" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Date To</label>
+                        <input type="date" name="to_date" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-xs">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Report Format</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <label class="relative flex items-center justify-center p-4 border-2 border-slate-50 rounded-xl cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-[#2563EB] has-[:checked]:bg-blue-50">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Report Format</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="relative flex flex-col items-center justify-center p-4 border-2 border-slate-50 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-[#2563EB] has-[:checked]:bg-blue-50/30 group">
                             <input type="radio" name="format" value="pdf" class="sr-only" checked>
-                            <div class="flex flex-col items-center gap-2">
-                                <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
-                                <span class="text-xs font-bold text-[#0F172A]">PDF Report</span>
+                            <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-sm">
+                                <svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 18H17V16H7V18Z" fill="currentColor"/>
+                                    <path d="M17 14H7V12H17V14Z" fill="currentColor"/>
+                                    <path d="M7 10H11V8H7V10Z" fill="currentColor"/>
+                                    <path d="M6 2C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2H6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </div>
+                            <span class="text-[9px] font-bold text-[#0F172A] uppercase tracking-wider">PDF Report</span>
                         </label>
-                        <label class="relative flex items-center justify-center p-4 border-2 border-slate-50 rounded-xl cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-[#2563EB] has-[:checked]:bg-blue-50">
+                        <label class="relative flex flex-col items-center justify-center p-4 border-2 border-slate-50 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-[#2563EB] has-[:checked]:bg-blue-50/30 group">
                             <input type="radio" name="format" value="excel" class="sr-only">
-                            <div class="flex flex-col items-center gap-2">
-                                <svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
-                                <span class="text-xs font-bold text-[#0F172A]">Excel Sheet</span>
+                            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-sm">
+                                <svg class="w-6 h-6 text-emerald-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 4C4 2.89543 4.89543 2 6 2H14L20 8V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 13H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 17H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10 13V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 13V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </div>
+                            <span class="text-[9px] font-bold text-[#0F172A] uppercase tracking-wider">Excel Sheet</span>
                         </label>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                <button type="submit" class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                     <span>Generate Report</span>
                 </button>
             </form>
