@@ -13,6 +13,14 @@ class AttendanceSession extends Model
         return $this->belongsTo(CourseUnit::class, 'course_unit_id');
     }
 
+    /**
+     * Alias for course relationship to prevent legacy/typo errors
+     */
+    public function courseUnit()
+    {
+        return $this->course();
+    }
+
     public function lecturer()
     {
         return $this->belongsTo(User::class, 'lecturer_id');
