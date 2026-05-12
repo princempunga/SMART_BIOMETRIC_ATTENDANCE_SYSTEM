@@ -38,8 +38,8 @@ class DeanController extends Controller
             $q->where('faculty_id', $facultyId);
         })->count();
 
-        $attendanceRate = $sessionsInFaculty > 0
-            ? min(round(($logsInFaculty / max($sessionsInFaculty, 1)) * 10, 1), 100)
+        $attendanceRate = ($sessionsInFaculty > 0 && $totalStudents > 0)
+            ? min(round(($logsInFaculty / ($sessionsInFaculty * $totalStudents)) * 100, 1), 100)
             : 0;
 
         $stats = [

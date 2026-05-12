@@ -42,9 +42,16 @@ class LecturerController extends Controller
             'total_logs' => AttendanceLog::whereHas('session', function($q) use ($lecturerId) {
                 $q->where('lecturer_id', $lecturerId);
             })->count(),
-            'avg_attendance' => '78%',
-            'current_week' => $currentWeek
         ];
+
+        $attendanceRate = 0;
+        $totalSessionsHeld = AttendanceSession::where('lecturer_id', $lecturerId)->where('status', 'completed')->count();
+        if ($totalSessionsHeld > 0 && $totalStudents > 0) {
+            $attendanceRate = round(($stats['total_logs'] / ($totalSessionsHeld * $totalStudents)) * 100);
+        }
+
+        $stats['avg_attendance'] = ($attendanceRate > 100 ? 100 : $attendanceRate) . '%';
+        $stats['current_week'] = $currentWeek;
 
         $todayTimetable = Timetable::whereHas('course.lecturers', function($q) use ($lecturerId) {
                 $q->where('users.id', $lecturerId);
