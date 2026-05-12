@@ -223,6 +223,8 @@ class LecturerController extends Controller
                 ? $log->clock_in->diffInMinutes($log->clock_out) 
                 : $log->clock_in->diffInMinutes(Carbon::now());
 
+            $duration = round($duration);
+
             // Calculate temporary mark
             $scheduledDuration = $session->timetable ? Carbon::parse($session->timetable->start_time)->diffInMinutes(Carbon::parse($session->timetable->end_time)) : 60;
             $percentage = ($duration / max($scheduledDuration, 1)) * 100;

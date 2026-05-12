@@ -8,6 +8,11 @@ class AttendanceSession extends Model
 {
     protected $fillable = ['course_unit_id', 'lecturer_id', 'classroom_id', 'timetable_id', 'session_start', 'session_end', 'week_number', 'otp', 'status'];
 
+    protected $casts = [
+        'session_start' => 'datetime',
+        'session_end' => 'datetime',
+    ];
+
     public function course()
     {
         return $this->belongsTo(CourseUnit::class, 'course_unit_id');

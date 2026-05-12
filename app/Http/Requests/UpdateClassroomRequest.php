@@ -11,7 +11,7 @@ class UpdateClassroomRequest extends FormRequest
         return true;
     }
 
-    public function rules(): bool
+    public function rules(): array
     {
         return [
             'room_name' => 'required|string|max:255',

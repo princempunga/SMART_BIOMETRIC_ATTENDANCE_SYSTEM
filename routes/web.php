@@ -24,7 +24,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::patch('/courses/{course}', [App\Http\Controllers\AdminController::class, 'updateCourse'])->name('courses.update');
     Route::delete('/courses/{course}', [App\Http\Controllers\AdminController::class, 'destroyCourse'])->name('courses.destroy');
     
-    Route::get('/attendance', [App\Http\Controllers\AdminController::class, 'attendance'])->name('attendance');
+    Route::get('/attendance', [App\Http\Controllers\AttendanceLogsController::class, 'index'])->name('attendance');
     Route::get('/reports', [App\Http\Controllers\AdminController::class, 'reports'])->name('reports');
     Route::post('/reports/generate', [App\Http\Controllers\AdminController::class, 'generateReport'])->name('reports.generate');
     Route::get('/simulate-data', [App\Http\Controllers\AttendanceSimulationController::class, 'seedDemoData'])->name('simulate-data');

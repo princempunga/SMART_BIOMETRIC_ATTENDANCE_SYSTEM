@@ -82,47 +82,47 @@
             </div>
         </div>
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-50 text-[10px] font-bold text-[#475569] uppercase tracking-wider">
+        <div class="overflow-x-auto custom-scrollbar shadow-inner bg-slate-50/10">
+            <table class="w-full text-left border-collapse min-w-[1000px]">
+                <thead class="bg-slate-50 text-[9px] font-bold text-[#475569] uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-4 sticky left-0 bg-slate-50 z-10 border-r border-slate-100">Student Information</th>
+                        <th class="px-4 py-4 sticky left-0 bg-slate-50 z-20 border-r border-slate-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] min-w-[180px]">Student Information</th>
                         @for($i = 1; $i <= 16; $i++)
-                        <th class="px-3 py-4 text-center border-r border-slate-100">W{{ $i }}</th>
+                        <th class="px-1 py-4 text-center border-r border-slate-100 min-w-[35px]">{{ $i }}</th>
                         @endfor
-                        <th class="px-6 py-4 text-center bg-blue-50/50">Total Time</th>
-                        <th class="px-6 py-4 text-center bg-blue-50/50">Score (/5)</th>
-                        <th class="px-6 py-4 text-center bg-blue-50/50">Rate</th>
-                        <th class="px-6 py-4 text-right bg-blue-50/50">Eligibility</th>
+                        <th class="px-3 py-4 text-center bg-blue-50/80 border-l border-slate-100">Time</th>
+                        <th class="px-3 py-4 text-center bg-blue-50/80">Rate</th>
+                        <th class="px-3 py-4 text-right bg-blue-50/80">Result</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
+                <tbody class="divide-y divide-slate-100 text-[13px]">
                     @forelse($reportData as $data)
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 sticky left-0 bg-white z-10 border-r border-slate-100 min-w-[200px]">
-                            <div class="font-bold text-[#0F172A]">{{ $data['student']->full_name }}</div>
-                            <div class="text-[10px] text-[#94A3B8] font-mono">{{ $data['student']->reg_number }}</div>
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="px-4 py-3 sticky left-0 bg-white z-10 border-r border-slate-100 group-hover:bg-slate-50 transition-colors shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                            <div class="font-bold text-[#0F172A] whitespace-nowrap">{{ $data['student']->full_name }}</div>
+                            <div class="text-[9px] text-[#94A3B8] font-mono">{{ $data['student']->reg_number }}</div>
                         </td>
                         
                         @foreach($data['weeks'] as $weekNum => $isPresent)
-                        <td class="px-3 py-4 text-center border-r border-slate-100">
+                        <td class="px-1 py-3 text-center border-r border-slate-100">
                             @if(in_array($weekNum, $weeksWithSessions))
                                 @if($isPresent)
-                                    <div class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mx-auto shadow-sm shadow-emerald-500/10">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    <div class="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-md flex items-center justify-center mx-auto shadow-sm shadow-emerald-500/10">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
                                 @else
-                                    <div class="w-6 h-6 bg-red-100 text-red-600 rounded-lg flex items-center justify-center mx-auto shadow-sm shadow-red-500/10">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    <div class="w-5 h-5 bg-red-100 text-red-600 rounded-md flex items-center justify-center mx-auto shadow-sm shadow-red-500/10">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </div>
                                 @endif
                             @else
-                                <div class="w-6 h-6 border border-dashed border-slate-200 rounded-lg mx-auto"></div>
+                                <div class="w-5 h-5 border border-dashed border-slate-200 rounded-md mx-auto opacity-20"></div>
+                            @endif
                             @endif
                         </td>
                         @endforeach
 
-                        <td class="px-6 py-4 text-center font-mono font-bold text-[#2563EB] bg-blue-50/20">
+                        <td class="px-3 py-3 text-center font-mono font-bold text-[#2563EB] bg-blue-50/30 border-l border-slate-100 whitespace-nowrap">
                             {{ floor($data['total_duration'] / 60) }}h {{ $data['total_duration'] % 60 }}m
                         </td>
 
@@ -133,29 +133,24 @@
                             </div>
                         </td>
                         
-                        <td class="px-6 py-4 text-center bg-blue-50/20">
-                            <div class="flex flex-col items-center">
-                                <span class="font-bold {{ $data['attendance_rate'] >= 75 ? 'text-emerald-600' : 'text-red-600' }}">
-                                    {{ number_format($data['attendance_rate'], 1) }}%
-                                </span>
-                                <div class="w-16 h-1 bg-slate-200 rounded-full mt-1 overflow-hidden">
-                                    <div class="h-full {{ $data['attendance_rate'] >= 75 ? 'bg-emerald-500' : 'bg-red-500' }}" style="width: {{ $data['attendance_rate'] }}%"></div>
-                                </div>
-                            </div>
+                        <td class="px-3 py-3 text-center bg-blue-50/30">
+                            <span class="font-bold {{ $data['attendance_rate'] >= 75 ? 'text-emerald-600' : 'text-red-600' }}">
+                                {{ number_format($data['attendance_rate'], 1) }}%
+                            </span>
                         </td>
 
-                        <td class="px-6 py-4 text-right bg-blue-50/20">
+                        <td class="px-3 py-3 text-right bg-blue-50/30 whitespace-nowrap">
                             @if($data['attendance_rate'] >= 75)
-                                <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full uppercase tracking-widest border border-emerald-100 shadow-sm shadow-emerald-500/5">Eligible</span>
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full uppercase border border-emerald-100">OK</span>
                             @else
-                                <span class="px-3 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full uppercase tracking-widest border border-red-100 shadow-sm shadow-red-500/5">Ineligible</span>
+                                <span class="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-bold rounded-full uppercase border border-red-100">FAIL</span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="21" class="px-6 py-20 text-center text-slate-400 italic font-medium">
-                            No students found for this course.
+                        <td colspan="21" class="px-6 py-24 text-center text-slate-400 italic font-medium">
+                            No student records available for analysis in this course.
                         </td>
                     </tr>
                     @endforelse
@@ -164,4 +159,22 @@
         </div>
     </div>
 </div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        height: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+        border: 2px solid #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
 @endsection

@@ -203,7 +203,7 @@
 
 <script>
     // Timer Logic
-    const startTimeStr = "{{ $session->session_start }}";
+    const startTimeStr = "{{ $session->session_start->toIso8601String() }}";
     const startTime = new Date(startTimeStr).getTime();
     setInterval(function() {
         let now = new Date().getTime();

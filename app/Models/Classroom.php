@@ -15,7 +15,8 @@ class Classroom extends Model
         'building_name',
         'floor_number',
         'seating_capacity',
-        'status'
+        'status',
+        'device_id'
     ];
 
     public function device()

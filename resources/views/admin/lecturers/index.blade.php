@@ -233,6 +233,10 @@
                             <!-- Course units will be loaded here -->
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Update Profile Photo</label>
+                        <input type="file" name="profile_photo" accept="image/*" class="w-full px-4 py-2 text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 rounded-md">
+                    </div>
                 </div>
             </div>
             <div class="pt-4 border-t border-slate-100">

@@ -24,4 +24,10 @@ class Department extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public function courseUnits(): HasMany
+    {
+        return $this->hasMany(CourseUnit::class);
+    }
+    }
 }

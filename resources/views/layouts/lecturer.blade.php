@@ -10,8 +10,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; }
-        .sidebar { background-color: #0F172A; width: 240px; }
-        .menu-item { color: #94A3B8; transition: all 0.2s; }
+        .sidebar { background-color: #0F172A; width: 220px; }
+        .menu-item { color: #94A3B8; transition: all 0.2s; font-size: 13px; }
         .menu-item:hover { background-color: #1E293B; color: white; }
         .menu-item.active { background-color: #2563EB; color: white; }
         .group-label { font-size: 10px; color: #475569; letter-spacing: 0.08em; padding: 20px 16px 8px; text-transform: uppercase; }
@@ -76,9 +76,9 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-[240px] flex flex-col">
+    <main class="flex-1 ml-[220px] flex flex-col min-w-0">
         <!-- Top Navbar -->
-        <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
+        <header class="h-14 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
             <h2 class="text-[18px] font-bold text-[#0F172A]">@yield('page_title')</h2>
             
             <div class="flex items-center gap-6">
@@ -98,7 +98,7 @@
         </header>
 
         <!-- Content Area -->
-        <div class="p-8">
+        <div class="p-6">
             @if(session('success'))
             <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-600 text-sm font-bold flex items-center gap-3">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
