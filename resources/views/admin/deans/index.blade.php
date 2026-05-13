@@ -11,7 +11,7 @@
             <p class="text-xs text-slate-400 mt-1">Manage faculty deans — each dean can only view their own faculty data.</p>
         </div>
         <button onclick="document.getElementById('addModal').classList.remove('hidden')"
-            class="bg-[#0F172A] hover:bg-[#1E293B] text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2">
+            class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Add Dean
         </button>
@@ -146,7 +146,7 @@
 
             <div class="pt-4 border-t border-slate-100">
                 <button type="submit"
-                    class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-500/20 transition-all text-sm uppercase tracking-widest">
+                    class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm uppercase tracking-widest">
                     Create Dean Account
                 </button>
             </div>
@@ -204,7 +204,7 @@
 
             <div class="pt-4 border-t border-slate-100">
                 <button type="submit"
-                    class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all text-sm uppercase tracking-widest">
+                    class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm uppercase tracking-widest">
                     Update Dean
                 </button>
             </div>

@@ -254,6 +254,50 @@ class LecturerController extends Controller
         ]);
     }
 
+    public function getAttendanceLogs($id)
+    {
+        $session = AttendanceSession::find($id);
+
+        if (!$session) {
+            return redirect()->route('lecturer.dashboard')->with('error', 'The session record you are looking for was not found or has been deleted.');
+        }
+
+        if ($session->lecturer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $logs = $session->attendanceLogs()
+            ->with('student')
+            ->latest()
+            ->get()
+            ->map(function ($log) use ($session) {
+                $duration = null;
+                if ($log->clock_in && $log->clock_out) {
+                    $duration = $log->clock_in->diffInMinutes($log->clock_out) . 'm';
+                } elseif ($log->clock_in) {
+                    $duration = $log->clock_in->diffInMinutes(Carbon::now()) . 'm (ongoing)';
+                }
+
+                return [
+                    'student_name'  => $log->student->full_name,
+                    'reg_number'    => $log->student->reg_number,
+                    'clock_in'      => $log->clock_in ? $log->clock_in->format('H:i:s') : '—',
+                    'clock_out'     => $log->clock_out ? $log->clock_out->format('H:i:s') : '—',
+                    'duration'      => $duration ?? '—',
+                    'status'        => $log->clock_out ? 'Completed' : 'In Class',
+                    'mark'          => $log->attendance_mark ?? 0,
+                ];
+            });
+
+        return response()->json([
+            'session_id'   => $session->id,
+            'course'       => $session->course->course_name ?? '—',
+            'week'         => $session->week_number,
+            'total'        => $logs->count(),
+            'logs'         => $logs,
+        ]);
+    }
+
     public function courses()
     {
         $courses = Auth::user()->courseUnits()->withCount(['sessions' => function($q) {

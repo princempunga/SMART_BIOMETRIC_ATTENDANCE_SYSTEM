@@ -7,9 +7,9 @@
     <form method="GET" class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-wrap gap-4 items-end">
         <div>
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Date</label>
-            <input type="date" name="date" value="{{ request('date') }}" class="border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <input type="date" name="date" value="{{ request('date') }}" class="border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <button type="submit" class="bg-purple-600 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-purple-700 transition-colors">Filter</button>
+        <button type="submit" class="bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-[#1D4ED8] transition-colors">Filter</button>
         <a href="{{ route('dean.attendance') }}" class="bg-slate-100 text-slate-600 px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors">Reset</a>
     </form>
 

@@ -4,6 +4,15 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'dean') {
+            return redirect()->route('dean.dashboard');
+        }
+        return redirect()->route('lecturer.dashboard');
+    }
     return redirect('/login');
 });
 
@@ -30,6 +39,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/simulate-data', [App\Http\Controllers\AttendanceSimulationController::class, 'seedDemoData'])->name('simulate-data');
     
     Route::resource('course-units', App\Http\Controllers\Admin\CourseUnitController::class);
+    Route::get('/get-departments/{faculty}', [App\Http\Controllers\AdminController::class, 'getDepartments'])->name('get-departments');
     Route::get('/api/faculties/{faculty}/course-units', [App\Http\Controllers\Admin\CourseUnitController::class, 'getByFaculty']);
 });
 
@@ -58,6 +68,10 @@ Route::middleware(['auth', 'verified', 'role:lecturer'])->prefix('lecturer')->na
 Route::middleware(['auth', 'verified', 'role:dean'])->prefix('dean')->name('dean.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\DeanController::class, 'index'])->name('dashboard');
     Route::get('/students', [App\Http\Controllers\DeanController::class, 'students'])->name('students');
+    Route::post('/students', [App\Http\Controllers\DeanController::class, 'storeStudent'])->name('students.store');
+    Route::patch('/students/{student}', [App\Http\Controllers\DeanController::class, 'updateStudent'])->name('students.update');
+    Route::delete('/students/{student}', [App\Http\Controllers\DeanController::class, 'destroyStudent'])->name('students.destroy');
+    
     Route::get('/lecturers', [App\Http\Controllers\DeanController::class, 'lecturers'])->name('lecturers');
     Route::get('/attendance', [App\Http\Controllers\DeanController::class, 'attendance'])->name('attendance');
     Route::get('/reports', [App\Http\Controllers\DeanController::class, 'reports'])->name('reports');

@@ -17,5 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('admin/*')) {
+                return redirect()->route('admin.dashboard')->with('error', 'The requested record was not found or has been deleted.');
+            }
+            if ($request->is('lecturer/*')) {
+                return redirect()->route('lecturer.dashboard')->with('error', 'The requested record was not found or has been deleted.');
+            }
+            if ($request->is('dean/*')) {
+                return redirect()->route('dean.dashboard')->with('error', 'The requested record was not found or has been deleted.');
+            }
+        });
     })->create();

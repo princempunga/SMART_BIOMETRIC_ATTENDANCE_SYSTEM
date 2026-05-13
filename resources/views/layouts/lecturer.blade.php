@@ -9,8 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; }
-        .sidebar { background-color: #0F172A; width: 220px; }
+        body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; overflow-x: hidden; }
+        .sidebar { background-color: #0F172A; width: 240px; }
+        .main-content { margin-left: 240px; }
         .menu-item { color: #94A3B8; transition: all 0.2s; font-size: 13px; }
         .menu-item:hover { background-color: #1E293B; color: white; }
         .menu-item.active { background-color: #2563EB; color: white; }
@@ -76,7 +77,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-[220px] flex flex-col min-w-0">
+    <main class="flex-1 main-content flex flex-col min-w-0">
         <!-- Top Navbar -->
         <header class="h-14 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
             <h2 class="text-[18px] font-bold text-[#0F172A]">@yield('page_title')</h2>

@@ -118,7 +118,6 @@
                             @else
                                 <div class="w-5 h-5 border border-dashed border-slate-200 rounded-md mx-auto opacity-20"></div>
                             @endif
-                            @endif
                         </td>
                         @endforeach
 

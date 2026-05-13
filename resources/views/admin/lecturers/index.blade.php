@@ -12,8 +12,6 @@
         </button>
     </div>
 
-    </div>
-
     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-100">
         <div class="overflow-x-auto">
             <table class="w-full text-left">

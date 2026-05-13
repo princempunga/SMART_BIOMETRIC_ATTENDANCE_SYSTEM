@@ -11,6 +11,7 @@ use App\Models\AttendanceSession;
 use App\Models\CourseUnit;
 use App\Models\Department;
 use App\Models\Faculty;
+use Illuminate\Support\Facades\Storage;
 
 class DeanController extends Controller
 {
@@ -72,13 +73,88 @@ class DeanController extends Controller
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('full_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('reg_number', 'like', '%' . $request->search . '%');
+                  ->orWhere('reg_number', 'like', '%' . $request->search . '%')
+                  ->orWhere('fingerprint_id', 'like', '%' . $request->search . '%');
             });
         }
 
         $students = $query->paginate(20);
 
         return view('dean.students', compact('students', 'departments'));
+    }
+
+    public function storeStudent(Request $request)
+    {
+        $facultyId = $this->getFacultyId();
+        
+        $data = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'reg_number' => 'required|string|unique:students,reg_number',
+            'department_id' => 'required|exists:departments,id',
+            'fingerprint_id' => 'required|integer|unique:students,fingerprint_id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg',
+        ]);
+
+        $data['faculty_id'] = $facultyId;
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('student_photos', 'public');
+        }
+
+        Student::create($data);
+
+        return redirect()->back()->with('success', 'Student registered successfully.');
+    }
+
+    public function updateStudent(Request $request, Student $student)
+    {
+        $facultyId = $this->getFacultyId();
+        
+        // Security check
+        if ($student->faculty_id != $facultyId) {
+            abort(403);
+        }
+
+        try {
+            $data = $request->validate([
+                'full_name' => 'required|string|max:255',
+                'reg_number' => 'required|string|unique:students,reg_number,' . $student->id,
+                'department_id' => 'required|exists:departments,id',
+                'fingerprint_id' => 'required|integer|unique:students,fingerprint_id,' . $student->id,
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            session()->flash('edit_student_id', $student->id);
+            throw $e;
+        }
+
+        if ($request->hasFile('photo')) {
+            if ($student->photo) {
+                Storage::disk('public')->delete($student->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('student_photos', 'public');
+        }
+
+        $student->update($data);
+
+        return redirect()->back()->with('success', 'Student profile updated successfully.');
+    }
+
+    public function destroyStudent(Student $student)
+    {
+        $facultyId = $this->getFacultyId();
+        
+        // Security check
+        if ($student->faculty_id != $facultyId) {
+            abort(403);
+        }
+
+        if ($student->photo) {
+            Storage::disk('public')->delete($student->photo);
+        }
+        $student->delete();
+        
+        return redirect()->back()->with('success', 'Student deleted successfully.');
     }
 
     public function lecturers()

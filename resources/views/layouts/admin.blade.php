@@ -11,6 +11,7 @@
     <style>
         body { font-family: 'DM Sans', sans-serif; background-color: #F1F5F9; margin: 0; padding: 0; overflow-x: hidden; }
         .sidebar { background-color: #0F172A; width: 240px; }
+        .main-content { margin-left: 240px; }
         .menu-item { color: #94A3B8; transition: all 0.2s; }
         .menu-item:hover { background-color: #1E293B; color: white; }
         .menu-item.active { background-color: #2563EB; color: white; }
@@ -115,7 +116,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-[240px] flex flex-col">
+    <main class="flex-1 main-content flex flex-col">
         <!-- Top Navbar -->
         <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
             <h2 class="text-[20px] font-bold text-[#0F172A]">@yield('page_title')</h2>
