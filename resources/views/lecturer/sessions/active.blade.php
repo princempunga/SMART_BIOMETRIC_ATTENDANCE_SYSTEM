@@ -248,8 +248,8 @@
                             <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
                                 <td class="px-8 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] font-bold text-xs group-hover:bg-white transition-colors">
-                                            ${log.student_name.charAt(0)}
+                                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] font-bold text-xs group-hover:bg-white transition-colors overflow-hidden">
+                                            ${log.photo ? `<img src="${log.photo}" class="w-full h-full object-cover">` : log.student_name.charAt(0)}
                                         </div>
                                         <div>
                                             <p class="font-bold text-sm text-[#0F172A]">${log.student_name}</p>

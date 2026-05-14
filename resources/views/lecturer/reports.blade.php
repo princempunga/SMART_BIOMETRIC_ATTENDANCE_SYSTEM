@@ -99,8 +99,19 @@
                     @forelse($reportData as $data)
                     <tr class="hover:bg-slate-50 transition-colors group">
                         <td class="px-4 py-3 sticky left-0 bg-white z-10 border-r border-slate-100 group-hover:bg-slate-50 transition-colors shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
-                            <div class="font-bold text-[#0F172A] whitespace-nowrap">{{ $data['student']->full_name }}</div>
-                            <div class="text-[9px] text-[#94A3B8] font-mono">{{ $data['student']->reg_number }}</div>
+                            <div class="flex items-center gap-3">
+                                @if($data['student']->photo)
+                                    <img src="{{ asset('storage/' . $data['student']->photo) }}" class="w-8 h-8 rounded-full object-cover shadow-sm">
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-[#0F172A]">
+                                        {{ substr($data['student']->full_name, 0, 1) }}
+                                    </div>
+                                @endif
+                                <div>
+                                    <div class="font-bold text-[#0F172A] whitespace-nowrap">{{ $data['student']->full_name }}</div>
+                                    <div class="text-[9px] text-[#94A3B8] font-mono">{{ $data['student']->reg_number }}</div>
+                                </div>
+                            </div>
                         </td>
                         
                         @foreach($data['weeks'] as $weekNum => $isPresent)

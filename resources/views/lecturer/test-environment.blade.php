@@ -123,8 +123,12 @@
                         </div>
 
                         <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-all relative">
-                            <svg class="w-8 h-8 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 20m0 0c1.398 0 2.72-.273 3.928-.766l.044.083m-1.404-1.43c1.297-2.507 2.328-5.784 2.328-9.571m0 0c0-4.418-3.582-8-8-8s-8 3.582-8 8m0 0c0 3.787 1.031 7.064 2.328 9.571m11.344-9.571c0 4.418-3.582 8-8 8s-8-3.582-8-8m0 0c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path></svg>
-                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-[#0F172A] text-white text-[8px] flex items-center justify-center rounded-lg font-bold">{{ $student->fingerprint_id }}</div>
+                            @if($student->photo)
+                                <img src="{{ asset('storage/' . $student->photo) }}" class="w-full h-full object-cover rounded-2xl">
+                            @else
+                                <svg class="w-8 h-8 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 20m0 0c1.398 0 2.72-.273 3.928-.766l.044.083m-1.404-1.43c1.297-2.507 2.328-5.784 2.328-9.571m0 0c0-4.418-3.582-8-8-8s-8 3.582-8 8m0 0c0 3.787 1.031 7.064 2.328 9.571m11.344-9.571c0 4.418-3.582 8-8 8s-8-3.582-8-8m0 0c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path></svg>
+                            @endif
+                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-[#0F172A] text-white text-[8px] flex items-center justify-center rounded-lg font-bold z-10">{{ $student->fingerprint_id }}</div>
                         </div>
                         <div>
                             <h5 class="font-bold text-sm text-[#0F172A]">{{ $student->full_name }}</h5>

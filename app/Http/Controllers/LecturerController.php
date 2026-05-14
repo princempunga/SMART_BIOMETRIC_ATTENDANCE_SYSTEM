@@ -237,6 +237,7 @@ class LecturerController extends Controller
             return [
                 'student_name' => $log->student->full_name,
                 'reg_number' => $log->student->reg_number,
+                'photo' => $log->student->photo ? asset('storage/' . $log->student->photo) : null,
                 'clock_in' => $log->clock_in->format('H:i:s'),
                 'clock_out' => $log->clock_out ? $log->clock_out->format('H:i:s') : '—',
                 'duration' => $duration . 'm',
