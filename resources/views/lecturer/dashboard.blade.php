@@ -123,8 +123,9 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Academic Week</label>
                                 <select name="week_number" required class="w-full bg-[#1E293B] border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2563EB] outline-none text-white">
+                                    <option value="" disabled selected>Select Week</option>
                                     @for($i=1; $i<=16; $i++)
-                                    <option value="{{ $i }}" {{ $stats['current_week'] == $i ? 'selected' : '' }}>Week {{ $i }}</option>
+                                    <option value="{{ $i }}">Week {{ $i }}</option>
                                     @endfor
                                 </select>
                             </div>
